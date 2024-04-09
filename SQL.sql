@@ -28,7 +28,7 @@ CREATE TABLE Account (
     password varchar(12),
     IdPersional int,
     IdPerm int,
-    FOREIGN KEY (IdPersional) REFERENCES Persional (IdPersional),
+    -- FOREIGN KEY (IdPersional) REFERENCES Persional (IdPersional),
     FOREIGN KEY (IdPerm) REFERENCES Permission (IdPerm)
 );
 
@@ -110,8 +110,9 @@ INSERT INTO Permission (namePerm)
 
 INSERT INTO Account (username, password, IdPersional, IdPerm) 
     VALUES 
-        ('thonh', '123456', 1, 1),
-        ('user2', '123456', 2, 3);
+        ('admin', 123456, 0, 1),
+        ('student1', '123456', 1, 4),
+        ('teacher1', '123456', 2, 3);
 
 INSERT INTO Students (codeStudent, firstnameStudent, lastnameStudent)
     VALUES
@@ -119,7 +120,7 @@ INSERT INTO Students (codeStudent, firstnameStudent, lastnameStudent)
 
 INSERT INTO Teachers (lastnameTeacher, firstnameTeacher) 
     VALUES 
-        ('Le Hoang', 'T');
+        ('Le Hoang', 'An');
 
 INSERT INTO Courses (CodeCourse, nameCourse, NumberLecture, NumberPractice)
     VALUES
