@@ -1,13 +1,21 @@
 from flask import Blueprint, request, render_template, session, url_for, redirect
-from mysql.connector import connect
-from modules import config
+import mysql.connector
 
 # Tạo Blueprint cho module
 appAuth = Blueprint('appAuth', __name__, static_folder='../statics')
 
 # Kết nối database
-connection = connect(**config['DATABASE'])
-mycursor = connection.cursor()
+# connection = connect(config.DATABASE['host'])
+# mycursor = connection.cursor()
+
+mydb = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    passwd="",
+    database="danhgia"
+)
+
+mycursor = mydb.cursor()
 
 # Định nghĩa route trong module
 @appAuth.route('/', methods=['GET', 'POST'])
@@ -32,9 +40,9 @@ def Login():
                 session['loggedin'] = True
                 session['idPersonal'] = result[3]
                 session['idPerm'] = result[4]
-                if session.get('idPerm') == 3:
-                    return redirect(url_for('appTeacher.DashboardTeacher'))
-                elif session.get('idPerm') == 4:
+                if session.get('idPerm') == 3: # Teacher
+                    return redirect(url_for('appTeacher.ListClassTeacher'))
+                elif session.get('idPerm') == 4: # Student
                     return redirect(url_for('appStudent.DashboardStudent'))
                 else:
                     return "Quyền không tồn tại!!!"
