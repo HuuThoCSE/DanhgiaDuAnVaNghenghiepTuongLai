@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% include "header.html" %}
+</head>
+<body>
+<div class="container">
+    {% include "narbar.html" %}
+    <h2>Danh sách đồ án
+        <!-- <button type="button" class="btn btn-success  pull-right" data-toggle="modal" data-target="#myModal">Add Student Data</button> -->
+    </h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">IdClass</th>
+                <th scope="col">Tên lớp</th>
+                <th scope="col">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in response %}
+                <tr>
+                    <td><b>{{item.0}}</td>
+                    <td>
+                        <a href="project/{{item.0}}" style="text-decoration: none;">
+                            <b>[{{item.1}}]</b>
+                        </a>
+                    </td>
+                    <td> 
+                        <a href="/update/{{item.0}}" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#modaledit{{item.1}}">Edit</a>
+                        <!-- <a href="/delete/{{item.1}}" class="btn btn-danger btn-xs" onclick="return confirm('Are You Sure For Delete?')">Delete</a> -->
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+        </table>
+</div>
+
+</body>
+</html>

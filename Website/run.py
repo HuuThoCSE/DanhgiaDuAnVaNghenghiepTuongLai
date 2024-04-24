@@ -8,6 +8,7 @@ from flask_login import LoginManager, current_user
 from modules.appCourse import appCourse
 from modules.appProject import appProject
 from modules.appAuth import appAuth
+from modules.appStaff import appStaff
 from modules.appStudent import appStudent
 from modules.appTeacher import appTeacher
 from modules.appCertificate import appCertificate
@@ -20,6 +21,7 @@ app.secret_key = secrets.token_urlsafe(16)
 app.register_blueprint(appCourse, url_prefix='/course')
 app.register_blueprint(appProject, url_prefix='/project')
 app.register_blueprint(appAuth, url_prefix='/auth')
+app.register_blueprint(appStaff, url_prefix='/staff')
 app.register_blueprint(appStudent, url_prefix='/student')
 app.register_blueprint(appTeacher, url_prefix='/teacher')
 app.register_blueprint(appCertificate, url_prefix='/certificate')
@@ -53,7 +55,13 @@ def index():
     data = mycursor.fetchall()
     return render_template("classcourse.html", response=data)
 
+@app.route('/logout')
+def logout():
+    session.pop('loggedin', None)
+    session.pop('username', None)
+    session.pop('idPerm', None)
+    session.pop('idStudent', None)
+    return redirect(url_for('appAuth.Login'))
+
 if __name__ == "__main__":
     app.run(host=IP, port=5000, debug=True)
-
-

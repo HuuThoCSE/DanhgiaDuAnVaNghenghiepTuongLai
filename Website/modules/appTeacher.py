@@ -41,8 +41,8 @@ def ListClassTeacher():
 
     return render_template('teacher/project_listclass.html', response=data)
 
-@appTeacher.route('/project/<nbr>/class')
-def ClassProjectTeacher():
+@appTeacher.route('/class/<nbr>')
+def ClassProjectTeacher(nbr):
     if 'loggedin' not in session:
         return redirect(url_for('appAuth.Login'))
     
@@ -53,4 +53,16 @@ def ClassProjectTeacher():
                      " where idClassCourse=%s", (idClassCourse, ))
     data = mycursor.fetchall()    
 
+    return render_template('teacher/project_class.html')
+
+@appTeacher.route('class/<nbr>/project')
+def ProjectTeacher(nbr):
+
+    idProject = nbr
+    mycursor = mydb.cursor()
+    mycursor.execute("SELECT a.idProject, a.nameProject, CONCAT(b.codeStudent, ' - ', b.lastnameStudent, ' ', b.firstnameStudent) as infoStudent"
+                     " FROM Projects a"
+                     " LEFT JOIN Students b ON a.IdLeader = b.IdStudent"
+                     " WHERE idProject=%s", (idProject, ))
+    data = mycursor.fetchall()
     return render_template('teacher/project_class.html')

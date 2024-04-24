@@ -5,18 +5,20 @@
     <title>Document</title>
 </head>
 <body>
-<div class="container-fluid">
-    <div class="col">
-        <a href="/"><img src="statics\images\logo_vlute.png" height="100px" width="100px" alt="" srcset=""></a>
-    </div>
-    <div class="row">
+<div class="container">
+    {% include "narbar.html" %}
+    
+    <div class="row mt-2">
         <div class="col-sm-12 col-lg-2 border rounded text-center">
-            <h1 class="">Menu 1</h1>
+            <!-- <h1 class="">CLASS</h1> -->
+            <img src="" alt="" srcset="">
             <a>Dashboard</a> </br>
-            <a>Certificate</a> </br>
-            <a>Setting</a> </br>
+            <a href="group">Quản lý nhóm</a> <br>
+            <a href="">Quản lý đồ án</a>
         </div>
+        
         <div class="col-sm-12 col-lg-8 border rounded">
+            {% for item in response %}
             <h1>Danh sách đồ án đăng ký: </h1>
                 <table>
                     <thead>
@@ -26,7 +28,6 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for item in response %}
                         <tr>
                             <td><a href="/project/{{item[0]}}"><b>{{item[1]}}</b></a></td>
                             <td> 
@@ -36,12 +37,10 @@
                               <!-- <a href="/DayClassPanel?idCourseClass={{item[0]}}" type="button" class="btn btn-warning btn-sm"><i class="bi bi-pencil-square"></i></a> -->
                             </td>
                         </tr>
-                        {% endfor %}
+                        
                     </tbody>
                 </table>
-        </div>
-        <div class="col-sm-12 col-lg-2 border rounded">
-
-        </div>
+            {% endfor %}
+        </div> 
 </div>
 {% include "footer.html" %}

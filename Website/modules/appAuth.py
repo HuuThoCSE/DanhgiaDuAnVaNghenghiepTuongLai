@@ -25,7 +25,7 @@ def Login():
         password = request.form['password']
 
         query = ("SELECT *"
-                " FROM account"
+                " FROM Account"
                 " WHERE username = %s")
         values = (username,)
         mycursor.execute(query, values)
@@ -38,11 +38,21 @@ def Login():
             if fetched_hash == password:
                 # Đăng nhập thành công
                 session['loggedin'] = True
-                session['idPersonal'] = result[3]
-                session['idPerm'] = result[4]
+                session['idAccount'] = result[0]
+                session['idPerm'] = result[3]
+
+                if session.get('idPerm') == 2: # Staff
+                    return redirect(url_for('appStaff.DashboardStaff'))
+
                 if session.get('idPerm') == 3: # Teacher
                     return redirect(url_for('appTeacher.ListClassTeacher'))
+
                 elif session.get('idPerm') == 4: # Student
+                    mycursor.execute("SELECT idStudent from Students where idAccount=%s", (result[0], ))
+                    result1 = mycursor.fetchone()
+                    session['idStudent'] = result1[0]
+                    print(result[0])
+
                     return redirect(url_for('appStudent.DashboardStudent'))
                 else:
                     return "Quyền không tồn tại!!!"
@@ -50,18 +60,11 @@ def Login():
                 # Mật khẩu không đúng
                 # error = 'Invalid credentials'
                 error = 'Mật khẩu không đúng ' + str(password) + ' - ' + str(fetched_hash)
-                return render_template('auth/login.html', error=error)
+                return render_template('auth/authentication-login.html', error=error)
         else:
             # Tên người dùng không tồn tại
             # error = 'Invalid credentials'
             error = 'Tên người dùng không tồn tại'
-            return render_template('auth/login.html', error=error)
+            return render_template('auth/authentication-login.html', error=error)
 
-    return render_template('auth/login.html')
-
-@appAuth.route('/logout')
-def logout():
-    session.pop('loggedin', None)
-    session.pop('username', None)
-    session.pop('idPerm', None)
-    return redirect(url_for('appAuth.Login'))
+    return render_template('auth/authentication-login.html')
