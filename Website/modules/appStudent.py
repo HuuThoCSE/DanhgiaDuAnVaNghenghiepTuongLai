@@ -14,14 +14,14 @@ mydb = mysql.connector.connect(
 mycursor = mydb.cursor()
 
 # Định nghĩa route trong module
-@appStudent.route('/dashboard')
+@appStudent.route('/') # dashboard
 def DashboardStudent():
     if 'loggedin' not in session:
         return redirect(url_for('appAuth.Login'))
     if session.get('idPerm') != 4:
         return "Bạn không có quyền vào trang này. Nếu lỗi liên hệ admin."
     
-    return render_template('student/dashboard.html')
+    return render_template('student/student_dashboard.html')
 
 @appStudent.route('/project')
 def listClassProject():
@@ -57,3 +57,18 @@ def profileStudent():
     print(data)
 
     return render_template('student/student_profile.html', response=data)
+
+@appStudent.route('/class')
+def ListClassStudent():
+    if 'loggedin' not in session:
+        return redirect(url_for('appAuth.Login'))
+    
+    mycursor.execute("SELECT a.idClassCourse, b.codeClassCourse, CONCAT(c.codeCourse,' - ',c.nameCourse) as fullnameClassCourse, CONCAT(d.lastnameTeacher, ' ',d.firstnameTeacher)"
+                     " FROM ErollClassCourse a"
+                     " LEFT JOIN ClassCourse b ON a.idClassCourse = b.idClassCourse"
+                     " LEFT JOIN Courses c ON b.idCourse = c.idCourse"
+                     " LEFT JOIN Teachers d ON b.idTeacher = d.idTeacher"
+                     " WHERE idStudent=%s", (session.get('idStudent'), ))
+    data = mycursor.fetchall()
+
+    return render_template('student/student_listclass.html', response=data)

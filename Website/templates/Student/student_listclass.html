@@ -11,13 +11,13 @@
 
     <title>SB Admin 2 - Dashboard</title>
 
-    <!-- Custom fonts for this template -->
-    <link href="/statics/style2/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <!-- Custom fonts for this template-->
+    <link href="statics/style2/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link
         href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
         rel="stylesheet">
 
-    <!-- Custom styles for this template -->
+    <!-- Custom styles for this template-->
     <link href="/statics/style2/css/sb-admin-2.min.css" rel="stylesheet">
 
     <!-- Custom styles for this page -->
@@ -34,7 +34,7 @@
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/teacher">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/student">
                 <!-- <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-laugh-wink"></i>
                 </div> -->
@@ -46,7 +46,7 @@
 
             <!-- Nav Item - Dashboard -->
             <li class="nav-item active">
-                <a class="nav-link" href="/teacher">
+                <a class="nav-link" href="/student">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Dashboard</span></a>
             </li>
@@ -61,15 +61,16 @@
 
             <!-- Nav Item - Pages Collapse Menu -->
             <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
-                    aria-expanded="true" aria-controls="collapseTwo">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseLophoc"
+                    aria-expanded="true" aria-controls="collapseLophoc">
                     <i class="fas fa-fw fa-cog"></i>
-                    <span>Lớp đồ án</span>
+                    <span>Lớp học</span>
                 </a>
-                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                <div id="collapseLophoc" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Quản lý lớp đồ án:</h6>
-                        <a class="collapse-item" href="/teacher/class">Danh sách lớp đồ án</a>
+                        <h6 class="collapse-header">Quản lý lớp học</h6>
+                        <a class="collapse-item" href="/student/Course">Danh sách lớp học</a>
+                        <!-- <a class="collapse-item" href="/staff/teacher/add">Thêm lớp học</a> -->
                     </div>
                 </div>
             </li>
@@ -216,15 +217,15 @@
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <!-- <span class="mr-2 d-none d-lg-inline text-gray-600 small">Douglas McGee</span> -->
-                                <img class="img-profile rounded-circle border" src="/statics/gif/professor.gif">
+                                <img class="img-profile rounded-circle border" src="/statics/gif/student.gif">
                             </a>
                             <!-- Dropdown - User Information -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                                 aria-labelledby="userDropdown">
-                                <a class="dropdown-item" href="/teacher/profile">
+                                <!-- <a class="dropdown-item" href="/staff/profile">
                                     <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                                     My Profile
-                                </a>
+                                </a> -->
 
                                 <!-- <a class="dropdown-item" href="#">
                                     <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
@@ -247,7 +248,20 @@
                 </nav>
                 <!-- End of Topbar -->
 
+                <!-- Begin Page Content -->
                 <div class="container-fluid">
+
+                    <!-- Page Heading -->
+                    <!-- <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h1 class="h3 mb-0 text-gray-800">Danh sách lớp học phần 
+                             <button type="button" class="btn btn-success  pull-right" data-toggle="modal" data-target="#myModal">Add Student Data</button> 
+                        </h2>
+                    </div> -->
+
+                    <!-- Content Row -->
+
+                    <!-- Content Row -->
+
                     <div class="card shadow">
                         <div class="card-header py-3">
                             <h6 class="m-0 font-weight-bold text-primary">Danh sách lớp học phần</h6>
@@ -260,7 +274,6 @@
                                         <tr>
                                             <th scope="col">IdClass</th>
                                             <th scope="col">Lớp học phần</th>
-                                            <th scope="col">Thao tác</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -268,20 +281,65 @@
                                             <tr>
                                                 <td><b>{{item.0}}</td>
                                                 <td>
-                                                    <a href="class/{{item.0}}" style="text-decoration: none;">
+                                                    <a href="/course/{{item.0}}" style="text-decoration: none;">
                                                         {{item.1}}<br>
                                                         <b>{{item[2]}}</b> <br>
                                                         GV: <b>{{item[3]}}</b>
                                                     </a>
                                                 </td>
-                                                <td> 
-                                                    <a href="/update/{{item.0}}" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#modaledit{{item.1}}">Edit</a>
+                                                <!-- <td>  -->
+                                                    <!-- <a href="/update/{{item.0}}" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#modaledit{{item.1}}">Edit</a> -->
                                                     <!-- <a href="/delete/{{item.1}}" class="btn btn-danger btn-xs" onclick="return confirm('Are You Sure For Delete?')">Delete</a> -->
-                                                </td>
+                                                <!-- </td> -->
                                             </tr>
                                         {% endfor %}
                                     </tbody>
                                 </table>
+                            </div>
+                        </div>
+                    </div>
+
+                        <!-- Area Chart -->
+                
+                        <!-- Pie Chart -->
+                        <div class="col-xl-4 col-lg-5">
+                            <div class="card shadow mb-4">
+                                <!-- Card Header - Dropdown -->
+                                <!-- <div
+                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <h6 class="m-0 font-weight-bold text-primary">Revenue Sources</h6>
+                                    <div class="dropdown no-arrow">
+                                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                                            aria-labelledby="dropdownMenuLink">
+                                            <div class="dropdown-header">Dropdown Header:</div>
+                                            <a class="dropdown-item" href="#">Action</a>
+                                            <a class="dropdown-item" href="#">Another action</a>
+                                            <div class="dropdown-divider"></div>
+                                            <a class="dropdown-item" href="#">Something else here</a>
+                                        </div>
+                                    </div>
+                                </div> -->
+                                <!-- Card Body -->
+                                <!-- <div class="card-body">
+                                    <div class="chart-pie pt-4 pb-2">
+                                        <canvas id="myPieChart"></canvas>
+                                    </div>
+                                    <div class="mt-4 text-center small">
+                                        <span class="mr-2">
+                                            <i class="fas fa-circle text-primary"></i> Direct
+                                        </span>
+                                        <span class="mr-2">
+                                            <i class="fas fa-circle text-success"></i> Social
+                                        </span>
+                                        <span class="mr-2">
+                                            <i class="fas fa-circle text-info"></i> Referral
+                                        </span>
+                                    </div>
+                                </div> -->
                             </div>
                         </div>
                     </div>

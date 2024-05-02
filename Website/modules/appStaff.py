@@ -65,3 +65,19 @@ def AddTeacherStaff():
             return str(e), 500
 
     return render_template('staff/staff_addteacher.html')
+
+
+@appStaff.route('/ListClass')
+def ListClassStaff():
+    if 'loggedin' not in session:
+        return redirect(url_for('appAuth.Login'))
+    if session.get('idPerm') != 2:
+        return "Bạn không có quyền vào trang này. Nếu lỗi liên hệ admin."
+
+    mycursor.execute("SELECT a.idClassCourse, a.codeClassCourse, CONCAT(b.codeCourse,' - ',b.nameCourse) as fullnameClassCourse, CONCAT(c.lastnameTeacher, ' ',c.firstnameTeacher)"
+                     " FROM Classcourse a"
+                     " LEFT JOIN Courses b ON a.idCourse = b.idCourse"
+                     " LEFT JOIN Teachers c ON a.idTeacher = c.idTeacher")
+    data = mycursor.fetchall()  
+    
+    return render_template('staff/staff_listclass.html', response=data)

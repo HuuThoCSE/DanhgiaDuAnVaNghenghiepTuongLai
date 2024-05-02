@@ -26,7 +26,7 @@ app.register_blueprint(appStudent, url_prefix='/student')
 app.register_blueprint(appTeacher, url_prefix='/teacher')
 app.register_blueprint(appCertificate, url_prefix='/certificate')
 
-# IP = "192.168.110.132"
+# IP = "192.168.31.254"
 IP = 'localhost'
 
 mydb = mysql.connector.connect(

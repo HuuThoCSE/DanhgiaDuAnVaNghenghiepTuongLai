@@ -51,11 +51,12 @@ def ListClassTeacher():
     if 'loggedin' not in session:
         return redirect(url_for('appAuth.Login'))
     
-    mycursor.execute("SELECT a.idClassCourse, a.codeClassCourse, CONCAT(b.codeCourse,' - ',b.nameCourse) as fullnameClassCourse"
+    mycursor.execute("SELECT a.idClassCourse, a.codeClassCourse, CONCAT(b.codeCourse,' - ',b.nameCourse) as fullnameClassCourse, CONCAT(c.lastnameTeacher, ' ',c.firstnameTeacher)"
                      " FROM Classcourse a"
                      " LEFT JOIN Courses b ON a.idCourse = b.idCourse"
-                     " WHERE idTeacher=%s", (session.get('idTeacher'), ) )
-    data = mycursor.fetchall()
+                     " LEFT JOIN Teachers c ON a.idTeacher = c.idTeacher"
+                     " WHERE c.idTeacher=%s", (session.get('idTeacher'), ))
+    data = mycursor.fetchall()  
 
     return render_template('teacher/project_listclass.html', response=data)
 

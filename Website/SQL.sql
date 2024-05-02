@@ -4,6 +4,13 @@ CREATE DATABASE DanhGia;
 
 USE DanhGia;
 
+CREATE TABLE Semester (
+    IdSemester int AUTO_INCREMENT primary key,
+    codeSemester varchar(3),
+    nameSemester text,
+    yearSemester int
+);
+
 CREATE TABLE Industries (
     IdIndustry int AUTO_INCREMENT primary key,
     nameIndustry text
@@ -26,6 +33,7 @@ CREATE TABLE Courses (
     idCourse int AUTO_INCREMENT primary key,
     CodeCourse varchar(6),
     nameCourse text,
+    nameCourseENG text NULL,
     NumberLecture int,
     NumberPractice int,
     sumcredit int
@@ -139,6 +147,19 @@ CREATE TABLE hisStudentDream (
 --   ADD CONSTRAINT FK_TemplProject_Courses FOREIGN KEY (CodeCourse)
 --     REFERENCES Courses(CodeCourse);
 
+CREATE TABLE ErollClassCourse (
+    idStudent INT,
+    idClassCourse INT,
+    codeSemester varchar(3),
+    PRIMARY KEY (idStudent, idClassCourse),
+    FOREIGN KEY (idStudent) REFERENCES Students (idStudent),
+    FOREIGN KEY (idClassCourse) REFERENCES ClassCourse (idClassCourse)
+);
+
+INSERT INTO Semester (codeSemester, nameSemester, yearSemester) VALUES 
+    ('231', 'Học kỳ 1', 2023),
+    ('232', 'Học kỳ 2', 2024);
+
 INSERT INTO Industries (nameIndustry) VALUES 
     ('Công nghệ thông tin'),
     ('Ô tô');
@@ -179,28 +200,30 @@ INSERT INTO Students (codeStudent, firstnameStudent, lastnameStudent, IdIndustry
 
 INSERT INTO Teachers (lastnameTeacher, firstnameTeacher, sex, idAccount) 
     VALUES 
-        ('Lê Hoàng', 'An', 1, 4),
-        ('Trần Thái', 'Bảo', 1, 5),
-        ('Trần Hồ', 'Đạt', 1, 6),
-        ('Nguyễn Ngọc', 'Nga', 0, 7),
-        ('Trần Minh', 'Sang', 1, 8),
-        ('Phan Anh', 'Cang', 1, 9),
-        ('Mai Thiên', 'Thư', 0, 10);
+        ('Lê Hoàng', 'An', 1, 4),       -- 1
+        ('Trần Thái', 'Bảo', 1, 5),     -- 2
+        ('Trần Hồ', 'Đạt', 1, 6),       -- 3
+        ('Nguyễn Ngọc', 'Nga', 0, 7),   -- 4
+        ('Trần Minh', 'Sang', 1, 8),    -- 5
+        ('Phan Anh', 'Cang', 1, 9),     -- 6
+        ('Mai Thiên', 'Thư', 0, 10);    -- 7
 
-INSERT INTO Courses (CodeCourse, nameCourse, NumberLecture, NumberPractice)
+INSERT INTO Courses (CodeCourse, nameCourse, nameCourseENG, NumberLecture, NumberPractice)
     VALUES
-        ('TH1510', 'Đồ án cơ sở ngành Khoa học máy tính', 0, 2),
-        ('SP1418', 'Chuẩn bị dạy học', 3, 0),
-        ('TH1507', 'Đồ án CNTT 1', 0, 1),
-        ('TH1512', 'Đồ án CNTT 2', 0, 1),
-        ('TH1391', 'Nguyên lý máy học', 2, 2);
+        ('TH1510', 'Đồ án cơ sở ngành Khoa học máy tính', '',0, 2),
+        ('SP1418', 'Chuẩn bị dạy học', '',3, 0),
+        ('TH1507', 'Đồ án CNTT 1', '',0, 1),
+        ('TH1512', 'Đồ án CNTT 2', '',0, 1),
+        ('TH1391', 'Nguyên lý máy học', 'Machine Learning', 2, 2),
+        ('TH1382', 'Học sâu', 'Deep Learning', 2, 2);
 
 INSERT INTO ClassCourse (codeClassCourse, idCourse, idTeacher)
     VALUES
         ('232_1TH1510_KS3A_01_ngoaigio', 1, 1),
         ('233_1SP1418_KS1A_tructiep', 2, 5),
         ('231_1TH1507_KS3A_04_ngoaigio', 3, 7),
-        ('222_1TH1391_KS2A_tructiep', 4, 6);
+        ('222_1TH1391_KS2A_tructiep', 4, 6),
+        ('232_1TH1382_KS2A_tructiep', 6, 6);
 
 INSERT INTO Projects (nameProject, description, idTeacher,idClassCourse, idLeader, typeProject)
     VALUES
@@ -209,6 +232,11 @@ INSERT INTO Projects (nameProject, description, idTeacher,idClassCourse, idLeade
         ('Nhận diện khuôn mặt', '', 5, 2, 2, 'ind'),
         ('Thiết kế và thực hiện mạch cân bằng Arduino cho quadcopter', '', 1, 1, 4, 'ind'),
         ('Phát hiện khối u não', '', 6, 3, 2, 'tea');
+
+INSERT INTO ErollClassCourse (idStudent, idClassCourse, codeSemester)
+    VALUES
+        (2, 1, '232'),
+        (2, 5, '232');
 
 INSERT INTO TeamProjects (idProject, idStudent)
     VALUES
@@ -251,3 +279,4 @@ INSERT INTO TemplProject (nameTemlProject, CodeCourse)
         ('Xây dựng website đề tài, khoá luận - ĐH SPKT Vĩnh Long', 'TH1512'),
         ('Xây dựng website hỗ trợ học tập cho sinh viên trường ĐH SPKT Vĩnh Long', 'TH1512'),
         ('Phát triển hệ thống quản lý vườn thanh long thông minh ứng dụng công nghệ iot và chuẩn đoán bệnh ở cây thanh long', 'TH1512');
+

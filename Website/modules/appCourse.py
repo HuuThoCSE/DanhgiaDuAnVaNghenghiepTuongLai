@@ -37,12 +37,15 @@ def TeacherClass(nbr):
     data = mycursor.fetchall()
     return render_template('ClassCourse/panel.html', response=data)
 
-@appCourse.route('teacher/<nbr>/project')
-def editTeacherClass(nbr):
-    idClassCourse = nbr
+@appCourse.route('/<idClassCourse>')
+def editTeacherClass(idClassCourse):
     mycursor = mydb.cursor()
-    mycursor.execute("SELECT *"
-                     " FROM Projects"
+    mycursor.execute("SELECT idClassCourse, codeClassCourse, nameCourse, CONCAT(CodeCourse,' - ', nameCourse), CONCAT(c.lastnameTeacher, ' ',c.firstnameTeacher)"
+                     " FROM ClassCourse a"
+                     " LEFT JOIN Courses b ON b.idCourse = a.idCourse"
+                     " LEFT JOIN Teachers c ON c.idTeacher = a.idTeacher"
                      " where idClassCourse=%s", (idClassCourse, ))
-    data = mycursor.fetchall()
-    return render_template('ClassCourse/project.html', response=data)
+    data = mycursor.fetchone()
+    print(data)
+    return render_template('course/index_course.html', title=data[2], response=data)
+
