@@ -44,15 +44,18 @@ def Login():
                 if session.get('idPerm') == 2: # Staff
                     return redirect(url_for('appStaff.DashboardStaff'))
 
-                if session.get('idPerm') == 3: # Teacher
-                    return redirect(url_for('appTeacher.ListClassTeacher'))
+                elif session.get('idPerm') == 3: # Teacher
+                    mycursor.execute("SELECT idTeacher from Teachers where idAccount=%s", (result[0], ))
+                    result1 = mycursor.fetchone()
+                    session['idTeacher'] = result1[0]
+                    print(result[0])
+                    return redirect(url_for('appTeacher.DashboardTeacher'))
 
                 elif session.get('idPerm') == 4: # Student
                     mycursor.execute("SELECT idStudent from Students where idAccount=%s", (result[0], ))
                     result1 = mycursor.fetchone()
                     session['idStudent'] = result1[0]
-                    print(result[0])
-
+                    print(result1[0])
                     return redirect(url_for('appStudent.DashboardStudent'))
                 else:
                     return "Quyền không tồn tại!!!"

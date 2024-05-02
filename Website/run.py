@@ -48,6 +48,15 @@ def loadData():
 def index():
     if 'loggedin' not in session:
         return redirect(url_for('appAuth.Login'))
+    
+    if session.get('idPerm') == 2: # Staff
+        return redirect(url_for('appStaff.DashboardStaff'))
+
+    elif session.get('idPerm') == 3: # Teacher
+        return redirect(url_for('appTeacher.DashboardTeacher'))
+
+    elif session.get('idPerm') == 4: # Student
+        return redirect(url_for('appStudent.DashboardStudent'))
 
     mycursor.execute("SELECT a.idClassCourse, CONCAT(a.codeClassCourse,' ',b.codeCourse,'- ',b.nameCourse) as fullnameClassCourse"
                      " FROM Classcourse a"
@@ -57,11 +66,20 @@ def index():
 
 @app.route('/logout')
 def logout():
-    session.pop('loggedin', None)
-    session.pop('username', None)
-    session.pop('idPerm', None)
-    session.pop('idStudent', None)
+    # session.pop('loggedin', None)
+    # session.pop('username', None)
+    # session.pop('idPerm', None)
+    # session.pop('idStudent', None)
+    # session.pop('idTeacher', None)
+    # session.pop('idStaff', None)
+
+    session.clear()
     return redirect(url_for('appAuth.Login'))
+
+
+@app.errorhandler(404)
+def page_not_found(error):
+  return render_template('Student/404.html'), 404
 
 if __name__ == "__main__":
     app.run(host=IP, port=5000, debug=True)

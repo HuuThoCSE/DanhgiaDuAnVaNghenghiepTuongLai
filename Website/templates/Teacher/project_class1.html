@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% include "header.html" %}
+    <title>Document</title>
+</head>
+<body>
+<div class="container">
+    {% include "narbar.html" %}
+    
+    <div class="row mt-2">
+        <div class="col-sm-12 col-lg-2 border rounded text-center">
+            <!-- <h1 class="">CLASS</h1> -->
+            <img src="" alt="" srcset="">
+            <a>Dashboard</a> </br>
+            <a href="group">Quản lý nhóm</a> <br>
+            <a href="">Quản lý đồ án</a>
+        </div>
+        
+        <div class="col-sm-12 col-lg-8 border rounded">
+            {% for item in response %}
+            <h1>Danh sách đồ án đăng ký: </h1>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tên đề tài</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><a href="/project/{{item[0]}}"><b>{{item[1]}}</b></a></td>
+                            <td> 
+                              <a href="/project/{{item[0]}}" type="button" class="btn btn-sm border">
+                                <img src="\statics\gif\arrow.gif" width="25px">
+                              </a>
+                              <!-- <a href="/DayClassPanel?idCourseClass={{item[0]}}" type="button" class="btn btn-warning btn-sm"><i class="bi bi-pencil-square"></i></a> -->
+                            </td>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+            {% endfor %}
+        </div> 
+</div>
+{% include "footer.html" %}

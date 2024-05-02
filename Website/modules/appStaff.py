@@ -14,7 +14,7 @@ mydb = mysql.connector.connect(
 mycursor = mydb.cursor()
 
 # Định nghĩa route trong module
-@appStaff.route('/dashboard')
+@appStaff.route('/') # dashboard
 def DashboardStaff():
     if 'loggedin' not in session:
         return redirect(url_for('appAuth.Login'))
