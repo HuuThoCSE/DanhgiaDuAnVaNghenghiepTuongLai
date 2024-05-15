@@ -5,7 +5,7 @@ import secrets
 import mysql.connector
 from flask_login import LoginManager, current_user
 
-from modules.appCourse import appCourse
+from modules.appCourse import appClassCourse
 from modules.appProject import appProject
 from modules.appAuth import appAuth
 from modules.appStaff import appStaff
@@ -18,7 +18,7 @@ app.secret_key = secrets.token_urlsafe(16)
 # login_manager = LoginManager(app)
 
 # Đăng ký Blueprints vào app
-app.register_blueprint(appCourse, url_prefix='/course')
+app.register_blueprint(appClassCourse, url_prefix='/course')
 app.register_blueprint(appProject, url_prefix='/project')
 app.register_blueprint(appAuth, url_prefix='/auth')
 app.register_blueprint(appStaff, url_prefix='/staff')
@@ -36,14 +36,6 @@ mydb = mysql.connector.connect(
     database="danhgia"
 )
 
-mycursor = mydb.cursor()
-
-@app.route('/loadData')
-def loadData():
-    mycursor.execute('SELECT * FROM Classcourse')
-    data = mycursor.fetchall()
-    return jsonify(response=data) 
-
 @app.route("/")
 def index():
     if 'loggedin' not in session:
@@ -58,6 +50,7 @@ def index():
     elif session.get('idPerm') == 4: # Student
         return redirect(url_for('appStudent.DashboardStudent'))
 
+    mycursor = mydb.cursor()
     mycursor.execute("SELECT a.idClassCourse, CONCAT(a.codeClassCourse,' ',b.codeCourse,'- ',b.nameCourse) as fullnameClassCourse"
                      " FROM Classcourse a"
                      " LEFT JOIN Courses b ON a.idCourse = b.idCourse")
@@ -66,20 +59,12 @@ def index():
 
 @app.route('/logout')
 def logout():
-    # session.pop('loggedin', None)
-    # session.pop('username', None)
-    # session.pop('idPerm', None)
-    # session.pop('idStudent', None)
-    # session.pop('idTeacher', None)
-    # session.pop('idStaff', None)
-
     session.clear()
     return redirect(url_for('appAuth.Login'))
 
-
-@app.errorhandler(404)
-def page_not_found(error):
-  return render_template('Student/404.html'), 404
+# @app.errorhandler(404)
+# def page_not_found(error):
+#   return render_template('Student/404.html'), 404
 
 if __name__ == "__main__":
     app.run(host=IP, port=5000, debug=True)

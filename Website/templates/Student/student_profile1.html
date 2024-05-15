@@ -18,7 +18,7 @@
       <!-- Sidebar scroll-->
       <div class="scroll-sidebar" data-simplebar>
         <div class="d-flex mb-4 align-items-center justify-content-between">
-            <a href="index.html" class="text-nowrap logo-img ms-0 ms-md-1">
+            <a href="/student" class="text-nowrap logo-img ms-0 ms-md-1">
               <!-- <img src="statics/icons/vlute.svg" width="90" alt=""> -->
               <b><h2>VLUTE</h2></b>
             </a>
@@ -47,24 +47,37 @@
                 <span class="hide-menu ms-2 ps-1">Dashboard</span>
               </a>
             </li>
-            
-            <li class="nav-small-cap">
-              <i class="ti ti-dots nav-small-cap-icon fs-5"></i>
-              <span class="hide-menu">Manager Teacher</span>
-            </li>
 
             <li class="sidebar-item">
               <a
+                class="sidebar-link sidebar-link primary-hover-bg"
+                href="/student/project"
+                aria-expanded="false"
+              >
+                <span class="aside-icon p-2 bg-light-primary rounded-3">
+                  <i class="ti ti-layout-dashboard fs-7 text-primary"></i>
+                </span>
+                <span class="hide-menu ms-2 ps-1">LỚP ĐỒ ÁN</span>
+              </a>
+            </li>
+            
+            <!-- <li class="nav-small-cap">
+              <i class="ti ti-dots nav-small-cap-icon fs-5"></i>
+              <span class="hide-menu">UI Componenst</span>
+            </li> -->
+
+            <!-- <li class="sidebar-item">
+              <a
                 class="sidebar-link sidebar-link warning-hover-bg"
-                href="teacher"
+                href="./ui-buttons.html"
                 aria-expanded="false"
               >
                 <span class="aside-icon p-2 bg-light-warning rounded-3">
                   <i class="ti ti-article fs-7 text-warning"></i>
                 </span>
-                <span class="hide-menu ms-2 ps-1">List Teacher</span>
+                <span class="hide-menu ms-2 ps-1">Buttons</span>
               </a>
-            </li>
+            </li> -->
 
             <!-- <li class="sidebar-item">
               <a
@@ -265,7 +278,7 @@
                 <a class="nav-link nav-icon-hover" href="javascript:void(0)" id="drop2" data-bs-toggle="dropdown"
                   aria-expanded="false">
                   <!-- <img src="statics/assets/images/profile/user1.jpg" alt="" width="35" height="35" class="rounded-circle"> -->
-                  <img src="statics\gif\businessman.gif" alt="" width="35" height="35" class="rounded-circle">
+                  <img src="statics\gif\student.gif" alt="" width="35" height="35" class="rounded-circle">
                 </a>
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop2">
                   <div class="message-body">
@@ -294,7 +307,51 @@
       <!--  Header End -->
       <div class="container-fluid">
         <div class="card">
-          
+          <div class="card-body">
+            <h1 class="card-title fw-semibold mb-4"><b>THÔNG TIN SINH VIÊN</b></h1>
+            
+            <div class="card">
+              <div class="card-header">
+                <h3><b>Thông tin đăng nhập</b></h3>
+              </div>
+              <div class="card-body">
+                {% for item in response %}
+                <div class="mb-3">
+                  <label for="exampleInputEmail1" class="form-label">Username: </label>
+                  <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="{{item.0}}" disabled>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <h3><b>Thông tin cá nhân</b></h3>
+              </div>
+              <div class="card-body">
+                <form>
+                  {% for item in response %}
+                  <div class="mb-3">
+                    <label for="exampleInputEmail1" class="form-label">MSSV: </label>
+                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="{{item.1}}" disabled>
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="exampleInputPassword1" class="form-label">Họ tên: </label>
+                    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="{{item.2}}" disabled>
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="exampleInputPassword1" class="form-label">Ngành: </label>
+                    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="{{item.3}}" disabled>
+                  </div>
+                  {% endfor %}
+                  <!-- <button type="submit" class="btn btn-primary">Submit</button> -->
+                </form>
+              </div>
+            </div>
+
+          </div>
         </div>
       </div>
     </div>
@@ -306,4 +363,4 @@
   <script src="statics/assets/libs/simplebar/dist/simplebar.js"></script>
 </body>
 
-</html>
+</html>`

@@ -9,7 +9,9 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>SB Admin 2 - Dashboard</title>
+    {% if title %}
+        <title>{{title}}</title>
+    {% endif %}
 
     <!-- Custom fonts for this template-->
     <link href="statics/style2/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -82,6 +84,22 @@
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Quản lý lớp học</h6>
                         <a class="collapse-item" href="/staff/ListClass">Danh sách lớp học</a>
+                        <!-- <a class="collapse-item" href="/staff/teacher/add">Thêm lớp học</a> -->
+                    </div>
+                </div>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseDoAn"
+                    aria-expanded="true" aria-controls="collapseDoAn">
+                    <i class="fas fa-fw fa-cog"></i>
+                    <span>Đề tài Đồ án</span>
+                </a>
+                <div id="collapseDoAn" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Quản lý Đề tài đồ án</h6>
+                        <a class="collapse-item" href="/staff/project-proposals">Đề xuất Đề tài đồ án</a>
+                        <a class="collapse-item" href="/staff/ListProject">Danh sách Đề tài đồ án</a>
                         <!-- <a class="collapse-item" href="/staff/teacher/add">Thêm lớp học</a> -->
                     </div>
                 </div>

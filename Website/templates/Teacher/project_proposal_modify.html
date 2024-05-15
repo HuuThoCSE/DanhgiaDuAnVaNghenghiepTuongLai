@@ -33,7 +33,7 @@
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/teacher">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/staff">
                 <!-- <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-laugh-wink"></i>
                 </div> -->
@@ -45,7 +45,7 @@
 
             <!-- Nav Item - Dashboard -->
             <li class="nav-item active">
-                <a class="nav-link" href="/teacher">
+                <a class="nav-link" href="/staff">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Dashboard</span></a>
             </li>
@@ -69,6 +69,21 @@
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Quản lý lớp đồ án:</h6>
                         <a class="collapse-item" href="/teacher/class">Danh sách lớp đồ án</a>
+                    </div>
+                </div>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseDoAn"
+                    aria-expanded="true" aria-controls="collapseDoAn">
+                    <i class="fas fa-fw fa-cog"></i>
+                    <span>Đề tài Đồ án</span>
+                </a>
+                <div id="collapseDoAn" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Quản lý Đề tài đồ án</h6>
+                        <a class="collapse-item" href="/teacher/project-proposals">Danh sách Đề xuất Đề tài</a>
+                        <a class="collapse-item" href="/teacher/project-proposals/create">Thêm Đề xuất đề tài</a>
                     </div>
                 </div>
             </li>
@@ -216,17 +231,23 @@
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <!-- <span class="mr-2 d-none d-lg-inline text-gray-600 small">Douglas McGee</span> -->
                                 <img class="img-profile rounded-circle border"
-                                    src="/statics/gif/professor.gif">
+                                    src="/statics/gif/businessman.gif">
                             </a>
-                            
                             <!-- Dropdown - User Information -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                                 aria-labelledby="userDropdown">
-                                <a href="/teacher/profile" class="d-flex align-items-center gap-2 dropdown-item">
-                                    <i class="ti ti-user fs-6"></i>
-                                    <p class="mb-0 fs-3">My Profile</p>
+                                <!-- <a class="dropdown-item" href="#">
+                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Profile
+                                </a> -->
+                                <!-- <a class="dropdown-item" href="#">
+                                    <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Settings
                                 </a>
-
+                                <a class="dropdown-item" href="#">
+                                    <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Activity Log
+                                </a> -->
                                 <!-- <div class="dropdown-divider"></div> -->
                                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
                                     <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
@@ -242,25 +263,41 @@
 
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
-
                     <!-- Page Heading -->
-                    <div class="mb-4">
-                        <h1 class="h3 mb-0 text-gray-800">{{response.1}}</h1>
-                        <span>{{response.3}}</span> <br>
-                        <span>GV: {{response.4}}</span>
-                    </div>
+                    <h1 class="h3 mb-2 text-gray-800">Chỉnh sửa Đề xuất Đề tài</h1>
                     
-
-                    <div class="card">
-                        <div class="card-header">
-                            
-                        </div>
+                    <!-- DataTales Example -->
+                    <div class="card shadow mb-4">
                         <div class="card-body">
-
+                            <form method="post">
+                                <label for="proposal_title">Tên đề tài: </label>
+                                <input type="text" name="proposal_title" id="proposal_title" class="form-control" value="{{ data[0] if data else '' }}">
+                                
+                                <label for="proposal_description">Mô tả đề tài: </label>
+                                <textarea name="proposal_description" id="proposal_description" class="form-control">{{ data[1] if data else '' }}</textarea>
+                                
+                                <label for="course_code">Học phần:</label>
+                                <select name="course_code" id="course_code" class="form-control">
+                                    {% for course in courses %}
+                                    <option value="{{ course[0] }}" {% if data and course[0] == data[2] %}selected{% endif %}>{{ course[1] }}</option>
+                                    {% endfor %}
+                                </select>
+                                
+                                <label for="semester_code">Học kỳ:</label>
+                                <select name="semester_code" id="semester_code" class="form-control">
+                                    {% for semester in semesters %}
+                                    <option value="{{ semester[0] }}" {% if data and semester[0] == data[3] %}selected{% endif %}>{{ semester[1] }}</option>
+                                    {% endfor %}
+                                </select>
+                                
+                                <br>
+                                <input type="submit" value="Cập nhật" class="btn btn-success">
+                            </form>
                         </div>
                     </div>
-
                 </div>
+                
+                       
                 <!-- /.container-fluid -->
 
             </div>
@@ -323,6 +360,10 @@
     <!-- Page level custom scripts -->
     <script src="/statics/style2/js/demo/chart-area-demo.js"></script>
     <script src="/statics/style2/js/demo/chart-pie-demo.js"></script>
+
+    <!-- Page level plugins -->
+    <script src="/vendor/datatables/jquery.dataTables.min.js"></script>
+    <script src="/vendor/datatables/dataTables.bootstrap4.min.js"></script>
 
 </body>
 

@@ -6,14 +6,31 @@ USE DanhGia;
 
 CREATE TABLE Semester (
     IdSemester int AUTO_INCREMENT primary key,
-    codeSemester varchar(3),
+    semester_code varchar(3),
     nameSemester text,
-    yearSemester int
+    yearSemester varchar(9),
+    CONSTRAINT U_Semester UNIQUE (semester_code)
 );
 
 CREATE TABLE Industries (
     IdIndustry int AUTO_INCREMENT primary key,
-    nameIndustry text
+    industry_code varchar(8),
+    industry_name_VNI varchar(255),
+    industry_name_ENG varchar(255)
+);
+
+CREATE TABLE Majors (
+    major_id int AUTO_INCREMENT primary key,
+    major_code varchar(8),
+    majour_name_VNI varchar(255),
+    major_name_ENG varchar(255)
+);
+
+CREATE TABLE specializations (
+    specialization_id int AUTO_INCREMENT primary key,
+    specialization_code varchar(8),
+    specialization_name_VNI varchar(255),
+    specialization_name_ENG varchar(255)
 );
 
 CREATE TABLE Permission (
@@ -31,12 +48,13 @@ CREATE TABLE Account (
 
 CREATE TABLE Courses (
     idCourse int AUTO_INCREMENT primary key,
-    CodeCourse varchar(6),
+    course_code varchar(6),
     nameCourse text,
     nameCourseENG text NULL,
     NumberLecture int,
     NumberPractice int,
-    sumcredit int
+    sumcredit int,
+    CONSTRAINT U_Courses UNIQUE (course_code)
 );
 
 DELIMITER //
@@ -52,21 +70,27 @@ END //
 DELIMITER ;
 
 CREATE TABLE Teachers (
-    idTeacher int AUTO_INCREMENT primary key,
+    idTeacher int AUTO_INCREMENT,
+    teacher_code varchar(3),
     firstnameTeacher varchar(50),
     lastnameTeacher varchar(100),
     sex int(1) null,
     birthday date null,
     idAccount INT NULL,
+    CONSTRAINT PK_Teachers PRIMARY KEY (idTeacher, teacher_code),
+    CONSTRAINT U_Teacher UNIQUE (teacher_code),
     CONSTRAINT PK_Teachers_Accounts 
         FOREIGN KEY (idAccount) REFERENCES Account (idAccount)
 );
 
 CREATE TABLE Staffs (
-    idStaff int AUTO_INCREMENT primary key,
+    idStaff int AUTO_INCREMENT,
+    staff_code varchar(8),
     lastnameStaff varchar(10),
     firstnameStaff varchar(10),
     idAccount int(8),
+    CONSTRAINT PK_Staffs PRIMARY KEY (idStaff, staff_code),
+    CONSTRAINT U_Staffs UNIQUE (staff_code),
     CONSTRAINT PK_Staffs_Accounts 
         FOREIGN KEY (idAccount) REFERENCES Account (idAccount)
 );
@@ -93,9 +117,26 @@ CREATE TABLE ClassCourse (
     FOREIGN KEY (idTeacher) REFERENCES Teachers (idTeacher)
 );
 
+CREATE TABLE ProjectProposal (
+    proposal_id int AUTO_INCREMENT PRIMARY KEY,
+    proposal_title varchar(500),
+    proposal_description text NULL,
+    teacher_code varchar(3),
+    course_code varchar(6),
+    semester_code varchar(3),
+    proposal_status varchar(8) DEFAULT 0,
+    datetimeProposal TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    datetimeApproved datetime NULL,
+    staffApproved varchar(3) NULL,
+    FOREIGN KEY (teacher_code) REFERENCES Teachers (teacher_code),
+    FOREIGN KEY (staffApproved) REFERENCES Staffs (staff_code),
+    FOREIGN KEY (course_code) REFERENCES Courses (course_code),
+    FOREIGN KEY (semester_code) REFERENCES Semester (semester_code)
+);
+
 CREATE TABLE Projects (
     idProject INT AUTO_INCREMENT primary key,
-    nameProject nvarchar(500),
+    nameProject varchar(500),
     description TEXT,
     idClassCourse int null,
     idTeacher INT,
@@ -150,15 +191,15 @@ CREATE TABLE hisStudentDream (
 CREATE TABLE ErollClassCourse (
     idStudent INT,
     idClassCourse INT,
-    codeSemester varchar(3),
+    semester_code varchar(3),
     PRIMARY KEY (idStudent, idClassCourse),
     FOREIGN KEY (idStudent) REFERENCES Students (idStudent),
     FOREIGN KEY (idClassCourse) REFERENCES ClassCourse (idClassCourse)
 );
 
-INSERT INTO Semester (codeSemester, nameSemester, yearSemester) VALUES 
-    ('231', 'Học kỳ 1', 2023),
-    ('232', 'Học kỳ 2', 2024);
+INSERT INTO Semester (semester_code, nameSemester, yearSemester) VALUES 
+    ('231', 'Học kỳ 1', '2023-2024'),
+    ('232', 'Học kỳ 2', '2023-2024');
 
 INSERT INTO Industries (nameIndustry) VALUES 
     ('Công nghệ thông tin'),
@@ -187,9 +228,9 @@ INSERT INTO Account (username, password, IdPerm)
         ('21022010', '123456', 4),      -- 12
         ('21022007', '123456', 4);      -- 13
 
-INSERT INTO Staffs (firstnameStaff, lastnameStaff, idAccount)
+INSERT INTO Staffs (staff_code, firstnameStaff, lastnameStaff, idAccount)
     VALUES
-        ('Van A', 'Nguyen', 2);
+        ('ST1', 'Van A', 'Nguyen', 2);
 
 INSERT INTO Students (codeStudent, firstnameStudent, lastnameStudent, IdIndustry, idAccount)
     VALUES
@@ -198,17 +239,17 @@ INSERT INTO Students (codeStudent, firstnameStudent, lastnameStudent, IdIndustry
         ('21022010', 'Bình', 'Lê Nguyễn Quang', 1, 12),
         ('21022007', 'Huyên', 'Nguyễn Văn', 1, 13);
 
-INSERT INTO Teachers (lastnameTeacher, firstnameTeacher, sex, idAccount) 
+INSERT INTO Teachers (teacher_code, lastnameTeacher, firstnameTeacher, sex, idAccount) 
     VALUES 
-        ('Lê Hoàng', 'An', 1, 4),       -- 1
-        ('Trần Thái', 'Bảo', 1, 5),     -- 2
-        ('Trần Hồ', 'Đạt', 1, 6),       -- 3
-        ('Nguyễn Ngọc', 'Nga', 0, 7),   -- 4
-        ('Trần Minh', 'Sang', 1, 8),    -- 5
-        ('Phan Anh', 'Cang', 1, 9),     -- 6
-        ('Mai Thiên', 'Thư', 0, 10);    -- 7
+        ('GV1', 'Lê Hoàng', 'An', 1, 4),       -- 1
+        ('GV2', 'Trần Thái', 'Bảo', 1, 5),     -- 2
+        ('GV3', 'Trần Hồ', 'Đạt', 1, 6),       -- 3
+        ('GV4', 'Nguyễn Ngọc', 'Nga', 0, 7),   -- 4
+        ('GV5', 'Trần Minh', 'Sang', 1, 8),    -- 5
+        ('GV6', 'Phan Anh', 'Cang', 1, 9),     -- 6
+        ('GV7', 'Mai Thiên', 'Thư', 0, 10);    -- 7
 
-INSERT INTO Courses (CodeCourse, nameCourse, nameCourseENG, NumberLecture, NumberPractice)
+INSERT INTO Courses (course_code, nameCourse, nameCourseENG, NumberLecture, NumberPractice)
     VALUES
         ('TH1510', 'Đồ án cơ sở ngành Khoa học máy tính', '',0, 2),
         ('SP1418', 'Chuẩn bị dạy học', '',3, 0),
@@ -233,7 +274,7 @@ INSERT INTO Projects (nameProject, description, idTeacher,idClassCourse, idLeade
         ('Thiết kế và thực hiện mạch cân bằng Arduino cho quadcopter', '', 1, 1, 4, 'ind'),
         ('Phát hiện khối u não', '', 6, 3, 2, 'tea');
 
-INSERT INTO ErollClassCourse (idStudent, idClassCourse, codeSemester)
+INSERT INTO ErollClassCourse (idStudent, idClassCourse, semester_code)
     VALUES
         (2, 1, '232'),
         (2, 5, '232');
@@ -242,6 +283,21 @@ INSERT INTO TeamProjects (idProject, idStudent)
     VALUES
         (4, 2),
         (4, 3);
+
+INSERT INTO ProjectProposal (proposal_title, teacher_code, course_code, semester_code)
+    VALUES
+        ("Thiết lập Captive Portal trên OPNPfsense", "GV2", "TH1510", '232'),
+        ("Áp dụng Ansible để tự động hoá cấu hình thiết bị mạng", "GV2", "TH1510", '232'),
+        ("Phát hiện tấn công mạng bằng máy học", "GV2", "TH1510", '232'),
+        ("Các mô hình học sâu (Deep Learning) sử dụng cho phát hiện xâm nhập mạng", "GV2", "TH1510", '232'),
+        ("Phát hiện mã độc dựa vào học máy và thông tin PE Header", "GV2", "TH1510", '232'),
+        ("PHÁT HIỆN TẤN CÔNG SQL INJECTION BẰNG HỌC MÁY", "GV2", "TH1510", '232'),
+        ("Web Application Firewalls (NGINX ModSecurity)", "GV2", "TH1510", '232'),
+        ("Web Application Firewalls (open-appsec)", "GV2", "TH1510", '232'),
+        ("Web Application Firewalls (Naxsi)", "GV2", "TH1510", '232'),
+        ("Web Application Firewalls (Shadow Daemon)", "GV2", "TH1510", '232'),
+        ("Web Application Firewalls (IronBee)", "GV2", "TH1510", '232'),
+        ("Web Application Firewalls (Lua-resty-WAF)", "GV2", "TH1510", '232');
  
 INSERT INTO TemplProject (nameTemlProject, CodeCourse)
     VALUES

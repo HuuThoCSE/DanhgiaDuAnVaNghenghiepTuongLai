@@ -56,14 +56,14 @@ def profileStudent():
     
     print(data)
 
-    return render_template('student/student_profile.html', response=data)
+    return render_template('student/student_profile.html', response=data, title='Profile')
 
 @appStudent.route('/class')
 def ListClassStudent():
     if 'loggedin' not in session:
         return redirect(url_for('appAuth.Login'))
     
-    mycursor.execute("SELECT a.idClassCourse, b.codeClassCourse, CONCAT(c.codeCourse,' - ',c.nameCourse) as fullnameClassCourse, CONCAT(d.lastnameTeacher, ' ',d.firstnameTeacher)"
+    mycursor.execute("SELECT a.idClassCourse, b.codeClassCourse, CONCAT(c.course_code,' - ',c.nameCourse) as fullnameClassCourse, CONCAT(d.lastnameTeacher, ' ',d.firstnameTeacher)"
                      " FROM ErollClassCourse a"
                      " LEFT JOIN ClassCourse b ON a.idClassCourse = b.idClassCourse"
                      " LEFT JOIN Courses c ON b.idCourse = c.idCourse"

@@ -15,8 +15,6 @@ mydb = mysql.connector.connect(
     database="danhgia"
 )
 
-mycursor = mydb.cursor()
-
 # Định nghĩa route trong module
 @appAuth.route('/', methods=['GET', 'POST'])
 def Login():
@@ -28,6 +26,7 @@ def Login():
                 " FROM Account"
                 " WHERE username = %s")
         values = (username,)
+        mycursor = mydb.cursor()
         mycursor.execute(query, values)
         result = mycursor.fetchone()
 
@@ -42,13 +41,23 @@ def Login():
                 session['idPerm'] = result[3]
 
                 if session.get('idPerm') == 2: # Staff
+                    mycursor.execute("SELECT idStaff, staff_code from Staffs where idAccount=%s", (result[0], ))
+                    result1 = mycursor.fetchone()
+                    session['idStaff'] = result1[0]
+                    session['staff_code'] = result1[1]
+                    print(result[0])
+                    print(result1[1])
+                    mycursor.close()
                     return redirect(url_for('appStaff.DashboardStaff'))
 
                 elif session.get('idPerm') == 3: # Teacher
-                    mycursor.execute("SELECT idTeacher from Teachers where idAccount=%s", (result[0], ))
+                    mycursor.execute("SELECT idTeacher, teacher_code from Teachers where idAccount=%s", (result[0], ))
                     result1 = mycursor.fetchone()
                     session['idTeacher'] = result1[0]
+                    session['teacher_code'] = result1[1]
                     print(result[0])
+                    print(result1[1])
+                    mycursor.close()
                     return redirect(url_for('appTeacher.DashboardTeacher'))
 
                 elif session.get('idPerm') == 4: # Student
@@ -56,6 +65,7 @@ def Login():
                     result1 = mycursor.fetchone()
                     session['idStudent'] = result1[0]
                     print(result1[0])
+                    mycursor.close()
                     return redirect(url_for('appStudent.DashboardStudent'))
                 else:
                     return "Quyền không tồn tại!!!"
@@ -70,4 +80,4 @@ def Login():
             error = 'Tên người dùng không tồn tại'
             return render_template('auth/authentication-login.html', error=error)
 
-    return render_template('auth/authentication-login.html')
+    return render_template('auth/authentication-login.html', title="ĐĂNG NHẬP")
