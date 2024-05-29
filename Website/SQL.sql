@@ -4,175 +4,189 @@ CREATE DATABASE DanhGia;
 
 USE DanhGia;
 
-CREATE TABLE Semester (
-    IdSemester int AUTO_INCREMENT primary key,
-    semester_code varchar(3),
-    nameSemester text,
-    yearSemester varchar(9),
+CREATE TABLE Semesters (
+    semester_id INT AUTO_INCREMENT,
+    semester_code VARCHAR(3),
+    nameSemester TEXT,
+    yearSemester VARCHAR(9),
+    CONSTRAINT PK_Semesters PRIMARY KEY (semester_id),
     CONSTRAINT U_Semester UNIQUE (semester_code)
-);
+) ENGINE=InnoDB;
 
 CREATE TABLE Industries (
-    IdIndustry int AUTO_INCREMENT primary key,
+    industry_id INT AUTO_INCREMENT,
     industry_code varchar(8),
     industry_name_VNI varchar(255),
-    industry_name_ENG varchar(255)
-);
+    industry_name_ENG varchar(255),
+    CONSTRAINT PK_Industries PRIMARY KEY (industry_id, industry_code),
+    CONSTRAINT U_Industries UNIQUE (industry_code)
+) ENGINE=InnoDB;
 
 CREATE TABLE Majors (
-    major_id int AUTO_INCREMENT primary key,
-    major_code varchar(8),
-    majour_name_VNI varchar(255),
-    major_name_ENG varchar(255)
-);
+    major_id INT AUTO_INCREMENT,
+    major_code VARCHAR(8),
+    major_name_VNI VARCHAR(255),
+    major_name_ENG VARCHAR(255),
+    CONSTRAINT PK_Majors PRIMARY KEY (major_id),
+    CONSTRAINT U_Majors UNIQUE (major_code)
+) ENGINE=InnoDB;
 
 CREATE TABLE specializations (
     specialization_id int AUTO_INCREMENT primary key,
     specialization_code varchar(8),
     specialization_name_VNI varchar(255),
     specialization_name_ENG varchar(255)
-);
+) ENGINE=InnoDB;
 
 CREATE TABLE Permission (
-    IDPerm int AUTO_INCREMENT primary key,
+    perm_id INT AUTO_INCREMENT primary key,
     namePerm text
-);
+) ENGINE=InnoDB;
 
-CREATE TABLE Account (
-    IdAccount int AUTO_INCREMENT primary key,
+CREATE TABLE Accounts (
+    account_id int AUTO_INCREMENT primary key,
     username varchar(12),
     password varchar(12),
-    IdPerm int,
-    FOREIGN KEY (IdPerm) REFERENCES Permission (IdPerm)
-);
+    perm_id int,
+    FOREIGN KEY (perm_id) REFERENCES Permission (perm_id)
+) ENGINE=InnoDB;
 
 CREATE TABLE Courses (
-    idCourse int AUTO_INCREMENT primary key,
+    course_id int AUTO_INCREMENT,
     course_code varchar(6),
-    nameCourse text,
-    nameCourseENG text NULL,
+    course_name TEXT,
+    course_name_ENG text NULL,
     NumberLecture int,
     NumberPractice int,
     sumcredit int,
+    CONSTRAINT PK_Courses PRIMARY KEY (course_id, course_code),
     CONSTRAINT U_Courses UNIQUE (course_code)
-);
+) ENGINE=InnoDB;
 
 DELIMITER //
-CREATE TRIGGER calculate_sumcredit AFTER UPDATE ON Courses
+CREATE TRIGGER calculate_sumcredit BEFORE UPDATE ON Courses
 FOR EACH ROW
 BEGIN
   IF NEW.NumberLecture <> OLD.NumberLecture OR NEW.NumberPractice <> OLD.NumberPractice THEN 
-    UPDATE Courses 
-    SET sumcredit = NEW.NumberLecture + NEW.NumberPractice 
-    WHERE idCourse = NEW.idCourse;
+    SET NEW.sumcredit = NEW.NumberLecture + NEW.NumberPractice;
   END IF;
 END //
 DELIMITER ;
 
 CREATE TABLE Teachers (
-    idTeacher int AUTO_INCREMENT,
-    teacher_code varchar(3),
+    teacher_id int AUTO_INCREMENT,
+    teacher_code varchar(8),
     firstnameTeacher varchar(50),
     lastnameTeacher varchar(100),
     sex int(1) null,
     birthday date null,
-    idAccount INT NULL,
-    CONSTRAINT PK_Teachers PRIMARY KEY (idTeacher, teacher_code),
+    account_id INT NULL,
+    CONSTRAINT PK_Teachers PRIMARY KEY (teacher_id, teacher_code),
     CONSTRAINT U_Teacher UNIQUE (teacher_code),
     CONSTRAINT PK_Teachers_Accounts 
-        FOREIGN KEY (idAccount) REFERENCES Account (idAccount)
-);
+        FOREIGN KEY (account_id) REFERENCES Accounts (account_id)
+) ENGINE=InnoDB;
 
 CREATE TABLE Staffs (
-    idStaff int AUTO_INCREMENT,
+    staff_id int AUTO_INCREMENT,
     staff_code varchar(8),
     lastnameStaff varchar(10),
     firstnameStaff varchar(10),
-    idAccount int(8),
-    CONSTRAINT PK_Staffs PRIMARY KEY (idStaff, staff_code),
+    account_id int(8),
+    CONSTRAINT PK_Staffs PRIMARY KEY (staff_id, staff_code),
     CONSTRAINT U_Staffs UNIQUE (staff_code),
     CONSTRAINT PK_Staffs_Accounts 
-        FOREIGN KEY (idAccount) REFERENCES Account (idAccount)
-);
+        FOREIGN KEY (account_id) REFERENCES Accounts (account_id)
+) ENGINE=InnoDB;
 
 CREATE TABLE Students (
-    idStudent INT AUTO_INCREMENT primary key,
-    codeStudent int(8),
-    lastnameStudent varchar(100),
-    firstnameStudent varchar(100),
-    idAccount int(8),
-    IdIndustry int(8),
+    student_id INT AUTO_INCREMENT,
+    student_code VARCHAR(8),
+    lastnameStudent VARCHAR(100),
+    firstnameStudent VARCHAR(100),
+    account_id INT,
+    industry_id INT,
+    CONSTRAINT PK_Students PRIMARY KEY (student_id, student_code),
+    CONSTRAINT U_Students UNIQUE (student_code),
     CONSTRAINT PK_Students_Accounts 
-        FOREIGN KEY (idAccount) REFERENCES Account (idAccount),
+        FOREIGN KEY (account_id) REFERENCES Accounts (account_id),
     CONSTRAINT PK_Students_Industries
-        FOREIGN KEY (IdIndustry) REFERENCES Industries (IdIndustry)
-);
+        FOREIGN KEY (industry_id) REFERENCES Industries (industry_id)
+) ENGINE=InnoDB;
 
 CREATE TABLE ClassCourse (
-    idClassCourse int AUTO_INCREMENT primary key,
-    codeClassCourse varchar(50),
-    idCourse int,
-    idTeacher int,
-    FOREIGN KEY (idCourse) REFERENCES Courses (idCourse),
-    FOREIGN KEY (idTeacher) REFERENCES Teachers (idTeacher)
-);
-
+    classcourse_id INT AUTO_INCREMENT,
+    classcourse_code varchar(50),
+    dateStart DATE,
+    dateEnd DATE,
+    course_id INT,
+    teacher_id INT,
+    CONSTRAINT PK_ClassCourse PRIMARY KEY (classcourse_id, classcourse_code),
+    CONSTRAINT U_ClassCourse UNIQUE (classcourse_code),
+    FOREIGN KEY (course_id) REFERENCES Courses (course_id),
+    FOREIGN KEY (teacher_id) REFERENCES Teachers (teacher_id)
+) ENGINE=InnoDB;
+    
 CREATE TABLE ProjectProposal (
-    proposal_id int AUTO_INCREMENT PRIMARY KEY,
-    proposal_title varchar(500),
-    proposal_description text NULL,
-    teacher_code varchar(3),
-    course_code varchar(6),
-    semester_code varchar(3),
-    proposal_status varchar(8) DEFAULT 0,
+    proposal_id INT AUTO_INCREMENT PRIMARY KEY,
+    proposal_title VARCHAR(500),
+    proposal_description TEXT NULL,
+    teacher_code VARCHAR(3),
+    course_code VARCHAR(6),
+    semester_code VARCHAR(3),
+    proposal_status VARCHAR(8) DEFAULT '0',
     datetimeProposal TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    datetimeApproved datetime NULL,
-    staffApproved varchar(3) NULL,
+    datetimeApproved DATETIME NULL,
+    staffApproved VARCHAR(8) NULL,
     FOREIGN KEY (teacher_code) REFERENCES Teachers (teacher_code),
     FOREIGN KEY (staffApproved) REFERENCES Staffs (staff_code),
     FOREIGN KEY (course_code) REFERENCES Courses (course_code),
-    FOREIGN KEY (semester_code) REFERENCES Semester (semester_code)
-);
+    FOREIGN KEY (semester_code) REFERENCES Semesters (semester_code)
+) ENGINE=InnoDB;
 
 CREATE TABLE Projects (
-    idProject INT AUTO_INCREMENT primary key,
+    project_id INT AUTO_INCREMENT primary key,
     nameProject varchar(500),
     description TEXT,
-    idClassCourse int null,
-    idTeacher INT,
-    idLeader int,
+    project_status TINYINT DEFAULT 0,
+    dateStart date NULL,
+    dateEnd date NULL,
+    classcourse_id INT NULL,
+    teacher_code VARCHAR(8),
+    student_code VARCHAR(8),
     typeProject char(3), -- Team or individual
-    FOREIGN KEY (idClassCourse) REFERENCES ClassCourse (idClassCourse),
-    FOREIGN KEY (idLeader) REFERENCES Students (idStudent)
-);
+    FOREIGN KEY (classcourse_id) REFERENCES ClassCourse (classcourse_id),
+    FOREIGN KEY (teacher_code) REFERENCES Teachers (teacher_code)
+    -- FOREIGN KEY (student_code) REFERENCES Students (student_code)
+) ENGINE=InnoDB;
 
 CREATE TABLE TemplProject (
     idTemlProject INT AUTO_INCREMENT,
     nameTemlProject nvarchar(500),
     CodeCourse varchar(6) NULL,
     CONSTRAINT PK_TemplProject PRIMARY KEY (idTemlProject)
-);
+) ENGINE=InnoDB;
 
 CREATE TABLE TeamProjects (
-    idTermProject INT AUTO_INCREMENT primary key,
-    idProject INT,
-    idStudent INT,
-    FOREIGN KEY (idProject) REFERENCES Projects (idProject),
-    FOREIGN KEY (idStudent) REFERENCES Students (idStudent)
-);
+    termproject_id INT AUTO_INCREMENT primary key,
+    project_id INT,
+    student_id INT,
+    FOREIGN KEY (project_id) REFERENCES Projects (project_id),
+    FOREIGN KEY (student_id) REFERENCES Students (student_id)
+) ENGINE=InnoDB;
 
 -- Bảng lưu trữ thông tin về các nghề nghiệp
 CREATE TABLE Careers (
     idCareer INT AUTO_INCREMENT PRIMARY KEY,
     nameCareer TEXT
-);
+) ENGINE=InnoDB;
 
 -- Bảng lưu trữ ước mơ nghề nghiệp hiện tại của sinh viên
 CREATE TABLE StudentDream (
     idAccount INT(8) PRIMARY KEY,
     idCareer INT,
     FOREIGN KEY (idCareer) REFERENCES Careers(idCareer)
-);
+) ENGINE=InnoDB;
 
 -- Bảng lưu trữ lịch sử thay đổi ước mơ nghề nghiệp của sinh viên
 CREATE TABLE hisStudentDream (
@@ -182,28 +196,28 @@ CREATE TABLE hisStudentDream (
     timestamphisStudentDream TIMESTAMP,
     FOREIGN KEY (idAccount) REFERENCES StudentDream(idAccount),
     FOREIGN KEY (idCareer) REFERENCES Careers(idCareer)
-);
+) ENGINE=InnoDB;
 
 -- ALTER TABLE TemplProject
 --   ADD CONSTRAINT FK_TemplProject_Courses FOREIGN KEY (CodeCourse)
 --     REFERENCES Courses(CodeCourse);
 
 CREATE TABLE ErollClassCourse (
-    idStudent INT,
-    idClassCourse INT,
+    student_id INT,
+    classcourse_id INT,
     semester_code varchar(3),
-    PRIMARY KEY (idStudent, idClassCourse),
-    FOREIGN KEY (idStudent) REFERENCES Students (idStudent),
-    FOREIGN KEY (idClassCourse) REFERENCES ClassCourse (idClassCourse)
-);
+    PRIMARY KEY (student_id, classcourse_id),
+    FOREIGN KEY (student_id) REFERENCES Students (student_id),
+    FOREIGN KEY (classcourse_id) REFERENCES ClassCourse (classcourse_id)
+) ENGINE=InnoDB;
 
-INSERT INTO Semester (semester_code, nameSemester, yearSemester) VALUES 
+INSERT INTO Semesters (semester_code, nameSemester, yearSemester) VALUES 
     ('231', 'Học kỳ 1', '2023-2024'),
     ('232', 'Học kỳ 2', '2023-2024');
 
-INSERT INTO Industries (nameIndustry) VALUES 
-    ('Công nghệ thông tin'),
-    ('Ô tô');
+INSERT INTO Industries (industry_code, industry_name_VNI) VALUES 
+    ('CTT', 'Công nghệ thông tin'), -- Infomation Technology
+    ('OTO', 'Ô tô'); -- automobile
 
 INSERT INTO Permission (namePerm) 
     VALUES
@@ -212,7 +226,7 @@ INSERT INTO Permission (namePerm)
         ('Teacher'),
         ('Student');
 
-INSERT INTO Account (username, password, IdPerm) 
+INSERT INTO Accounts (username, password, perm_id) 
     VALUES 
         ('admin', '123456', 1),         -- 1
         ('pdt1', '123456', 2),          -- 2
@@ -226,20 +240,22 @@ INSERT INTO Account (username, password, IdPerm)
         ('teacher7', '123456', 3),      -- 10
         ('21022002', '123456', 4),      -- 11
         ('21022010', '123456', 4),      -- 12
-        ('21022007', '123456', 4);      -- 13
+        ('21022007', '123456', 4),      -- 13
+        ('21022009', '123456', 4);      -- 14
 
-INSERT INTO Staffs (staff_code, firstnameStaff, lastnameStaff, idAccount)
+INSERT INTO Staffs (staff_code, firstnameStaff, lastnameStaff, account_id)
     VALUES
         ('ST1', 'Van A', 'Nguyen', 2);
 
-INSERT INTO Students (codeStudent, firstnameStudent, lastnameStudent, IdIndustry, idAccount)
+INSERT INTO Students (student_code, firstnameStudent, lastnameStudent, industry_id, account_id)
     VALUES
         ('21022002', 'Thư', 'Âu Thị Anh', 1,  11),
         ('21022008', 'Thọ', 'Nguyễn Hữu', 1,  3),
         ('21022010', 'Bình', 'Lê Nguyễn Quang', 1, 12),
-        ('21022007', 'Huyên', 'Nguyễn Văn', 1, 13);
+        ('21022007', 'Huyên', 'Nguyễn Văn', 1, 13),
+        ('21022006', 'Phú', 'Tăng Huỳnh Thanh', 1, 14);
 
-INSERT INTO Teachers (teacher_code, lastnameTeacher, firstnameTeacher, sex, idAccount) 
+INSERT INTO Teachers (teacher_code, lastnameTeacher, firstnameTeacher, sex, account_id) 
     VALUES 
         ('GV1', 'Lê Hoàng', 'An', 1, 4),       -- 1
         ('GV2', 'Trần Thái', 'Bảo', 1, 5),     -- 2
@@ -249,7 +265,7 @@ INSERT INTO Teachers (teacher_code, lastnameTeacher, firstnameTeacher, sex, idAc
         ('GV6', 'Phan Anh', 'Cang', 1, 9),     -- 6
         ('GV7', 'Mai Thiên', 'Thư', 0, 10);    -- 7
 
-INSERT INTO Courses (course_code, nameCourse, nameCourseENG, NumberLecture, NumberPractice)
+INSERT INTO Courses (course_code, course_name, course_name_ENG, NumberLecture, NumberPractice)
     VALUES
         ('TH1510', 'Đồ án cơ sở ngành Khoa học máy tính', '',0, 2),
         ('SP1418', 'Chuẩn bị dạy học', '',3, 0),
@@ -258,28 +274,29 @@ INSERT INTO Courses (course_code, nameCourse, nameCourseENG, NumberLecture, Numb
         ('TH1391', 'Nguyên lý máy học', 'Machine Learning', 2, 2),
         ('TH1382', 'Học sâu', 'Deep Learning', 2, 2);
 
-INSERT INTO ClassCourse (codeClassCourse, idCourse, idTeacher)
+INSERT INTO ClassCourse (classcourse_code, dateStart, dateEnd, course_id, teacher_id)
     VALUES
-        ('232_1TH1510_KS3A_01_ngoaigio', 1, 1),
-        ('233_1SP1418_KS1A_tructiep', 2, 5),
-        ('231_1TH1507_KS3A_04_ngoaigio', 3, 7),
-        ('222_1TH1391_KS2A_tructiep', 4, 6),
-        ('232_1TH1382_KS2A_tructiep', 6, 6);
+        ('232_1TH1510_KS3A_01_ngoaigio', '2024-03-11', '2024-06-30',1, 1),
+        ('233_1SP1418_KS1A_tructiep', '2023-03-11', '2023-06-30', 2, 5),
+        ('231_1TH1507_KS3A_04_ngoaigio', '2023-03-11', '2023-06-30', 3, 7),
+        ('222_1TH1391_KS2A_tructiep', '2023-03-11', '2023-06-30', 4, 6),
+        ('232_1TH1382_KS2A_tructiep', '2024-03-11', '2024-06-30', 6, 6);
 
-INSERT INTO Projects (nameProject, description, idTeacher,idClassCourse, idLeader, typeProject)
+INSERT INTO Projects (nameProject, description, teacher_code, classcourse_id, student_code, typeProject)
     VALUES
-        ('Phát hiện và khoanh vùng khối u não ', '', 1, 1, 1, 'ind'),
-        ('Hệ thống quản lý đồ án và đánh giá kỹ nănng CNTT sinh viên', 'Website quản lý đồ án sinh viên thông qua các giao diện', 1, 1, 2, 'ind'),
-        ('Nhận diện khuôn mặt', '', 5, 2, 2, 'ind'),
-        ('Thiết kế và thực hiện mạch cân bằng Arduino cho quadcopter', '', 1, 1, 4, 'ind'),
-        ('Phát hiện khối u não', '', 6, 3, 2, 'tea');
+        ('Phát hiện và khoanh vùng khối u não', '', 'GV1', 1, '21022002', 'ind'),
+        ('Hệ thống quản lý đồ án và phân loại chủ đề đồ án công nghệ thông tin', 'Website quản lý đồ án sinh viên thông qua các giao diện', 'GV1', 1, '21022008', 'ind'),
+        ('Nhận diện khuôn mặt', '', 'GV5', 2, '21022008', 'ind'),
+        ('Thiết kế và thực hiện mạch cân bằng Arduino cho quadcopter', '', 'GV1', 1, '21022007', 'ind'),
+        ('Phát hiện khối u não', '', 'GV6', 3, '21022008', 'tea'),
+        ('Phát hiện vật thể bằng YOLOv8 trên website', '', 'GV1', 1, '21022006', 'ind');
 
-INSERT INTO ErollClassCourse (idStudent, idClassCourse, semester_code)
+INSERT INTO ErollClassCourse (student_id, classcourse_id, semester_code)
     VALUES
         (2, 1, '232'),
         (2, 5, '232');
 
-INSERT INTO TeamProjects (idProject, idStudent)
+INSERT INTO TeamProjects (project_id, student_id)
     VALUES
         (4, 2),
         (4, 3);

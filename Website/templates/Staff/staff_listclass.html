@@ -277,7 +277,7 @@
                                         <tr>
                                             <th scope="col">IdClass</th>
                                             <th scope="col">Lớp học phần</th>
-                                            <th scope="col">Thao tác</th>
+                                            <!-- <th scope="col">Thao tác</th> -->
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -285,16 +285,16 @@
                                             <tr>
                                                 <td><b>{{item.0}}</td>
                                                 <td>
-                                                    <a href="class/{{item.0}}" style="text-decoration: none;">
+                                                    <a href="/course/{{item.0}}" style="text-decoration: none;">
                                                         {{item.1}}<br>
                                                         <b>{{item[2]}}</b> <br>
                                                         GV: <b>{{item[3]}}</b>
                                                     </a>
                                                 </td>
-                                                <td> 
-                                                    <a href="/update/{{item.0}}" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#modaledit{{item.1}}">Edit</a>
+                                                <!-- <td>  -->
+                                                    <!-- <a href="/update/{{item.0}}" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#modaledit{{item.1}}">Edit</a> -->
                                                     <!-- <a href="/delete/{{item.1}}" class="btn btn-danger btn-xs" onclick="return confirm('Are You Sure For Delete?')">Delete</a> -->
-                                                </td>
+                                                <!-- </td> -->
                                             </tr>
                                         {% endfor %}
                                     </tbody>

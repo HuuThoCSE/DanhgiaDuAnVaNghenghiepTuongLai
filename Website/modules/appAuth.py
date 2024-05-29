@@ -23,7 +23,7 @@ def Login():
         password = request.form['password']
 
         query = ("SELECT *"
-                " FROM Account"
+                " FROM Accounts"
                 " WHERE username = %s")
         values = (username,)
         mycursor = mydb.cursor()
@@ -41,7 +41,7 @@ def Login():
                 session['idPerm'] = result[3]
 
                 if session.get('idPerm') == 2: # Staff
-                    mycursor.execute("SELECT idStaff, staff_code from Staffs where idAccount=%s", (result[0], ))
+                    mycursor.execute("SELECT staff_id, staff_code from Staffs where account_id=%s", (result[0], ))
                     result1 = mycursor.fetchone()
                     session['idStaff'] = result1[0]
                     session['staff_code'] = result1[1]
@@ -51,7 +51,7 @@ def Login():
                     return redirect(url_for('appStaff.DashboardStaff'))
 
                 elif session.get('idPerm') == 3: # Teacher
-                    mycursor.execute("SELECT idTeacher, teacher_code from Teachers where idAccount=%s", (result[0], ))
+                    mycursor.execute("SELECT teacher_id, teacher_code from Teachers where account_id=%s", (result[0], ))
                     result1 = mycursor.fetchone()
                     session['idTeacher'] = result1[0]
                     session['teacher_code'] = result1[1]
@@ -61,7 +61,7 @@ def Login():
                     return redirect(url_for('appTeacher.DashboardTeacher'))
 
                 elif session.get('idPerm') == 4: # Student
-                    mycursor.execute("SELECT idStudent from Students where idAccount=%s", (result[0], ))
+                    mycursor.execute("SELECT student_id from Students where account_id=%s", (result[0], ))
                     result1 = mycursor.fetchone()
                     session['idStudent'] = result1[0]
                     print(result1[0])

@@ -63,12 +63,12 @@ def ListClassStudent():
     if 'loggedin' not in session:
         return redirect(url_for('appAuth.Login'))
     
-    mycursor.execute("SELECT a.idClassCourse, b.codeClassCourse, CONCAT(c.course_code,' - ',c.nameCourse) as fullnameClassCourse, CONCAT(d.lastnameTeacher, ' ',d.firstnameTeacher)"
+    mycursor.execute("SELECT a.classcourse_id, b.classcourse_code, CONCAT(c.course_code,' - ',c.course_name) as fullnameClassCourse, CONCAT(d.lastnameTeacher, ' ',d.firstnameTeacher)"
                      " FROM ErollClassCourse a"
-                     " LEFT JOIN ClassCourse b ON a.idClassCourse = b.idClassCourse"
-                     " LEFT JOIN Courses c ON b.idCourse = c.idCourse"
-                     " LEFT JOIN Teachers d ON b.idTeacher = d.idTeacher"
-                     " WHERE idStudent=%s", (session.get('idStudent'), ))
+                     " LEFT JOIN ClassCourse b ON a.classcourse_id = b.classcourse_id"
+                     " LEFT JOIN Courses c ON b.course_id = c.course_id"
+                     " LEFT JOIN Teachers d ON b.teacher_id = d.teacher_id"
+                     " WHERE student_id=%s", (session.get('idStudent'), ))
     data = mycursor.fetchall()
 
     return render_template('student/student_listclass.html', response=data)

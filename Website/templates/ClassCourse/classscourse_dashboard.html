@@ -266,10 +266,39 @@
 
                     <div class="card">
                         <div class="card-header">
-                            
+                            <h1><b>THÔNG TIN LỚP HỌC PHẦN</b></h1>
                         </div>
                         <div class="card-body">
+                            <div class="row">
+                                <div class="col-6">
+                                    <p><b>Mã lớp học phần:</b> {{ response[1] }}</p>
+                                    <p><b>Tên lớp học phần:</b> {{ response[2] }}</p>
+                                    <p><b>Ngày bắt đầu:</b> {{ response[5] }}</p>
+                                    <!-- <p><b>Số lượng sinh viên:</b></p> -->
+                                </div>
+                                <div class="col-6">
+                                    <p><b>Giảng viên:</b> {{ response[4] }}</p>
+                                    <!-- <p><b>Phòng học:</b></p> -->
+                                    <!-- <p><b>Thời gian học:</b></p> -->
+                                    <p><b>Ngày kết thúc:</b> {{ response[6] }}</p>
+                                    <!-- <p><b>Trạng thái:</b> {{ response[9] }}</p> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
+                    <div class="card mt-2">
+                        <div class="card-header">
+                            <h1><b>ĐỒ ÁN LỚP HỌC</b></h1>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                {% if idPerm == 3 %}
+                                <a href="/course/{{ response.0 }}/project" class="btn btn-primary">DANH SÁCH ĐỒ ÁN</a>
+                                {% elif idPerm == 4 %}
+                                <a href="/course/{{ response.0 }}/project/" class="btn btn-primary">ĐỒ ÁN CÁ NHÂN</a>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
 

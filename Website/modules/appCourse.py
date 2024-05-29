@@ -38,8 +38,8 @@ def get_menu(idPerm):
             'title': 'Đề tài',
             'icon': 'fa-book',
             'submenus': [
-                {'name': 'Danh sách đề tài', 'url': '/teacher/topics'},
-                {'name': 'Thêm đề tài mới', 'url': '/teacher/topics/add'}
+                {'name': 'Danh sách Đề xuất', 'url': '/teacher/project-proposals'},
+                {'name': 'Thêm Đề xuất', 'url': '/teacher/project-proposals/create'}
             ]
         })
     if idPerm == 4:  # Chỉ Sinh viên
@@ -69,12 +69,14 @@ def loadCourse(idCourseClass):
 def TeacherClass(nbr):
     idClassCourse = nbr
     mycursor = mydb.cursor()
-    mycursor.execute("SELECT a.idClassCourse, a.codeClassCourse, CONCAT(b.course_code, ' - ', b.nameCourse) as fullnameCourse,CONCAT(c.lastnameTeacher, ' ', c.firstnameTeacher) as fullnameTeaccher"
+    mycursor.execute("SELECT a.classcourse_id, a.classcourse_code, CONCAT(b.course_code, ' - ', b.course_name) as fullnameCourse,CONCAT(c.lastnameTeacher, ' ', c.firstnameTeacher) as fullnameTeaccher"
                      " FROM ClassCourse a"
-                     " LEFT JOIN Courses b ON a.idCourse = b.idCourse"
-                     " LEFT JOIN Teachers c ON a.idTeacher = c.idTeacher"
-                     " where idClassCourse=%s", (idClassCourse, ))
+                     " LEFT JOIN Courses b ON a.course_id = b.course_id"
+                     " LEFT JOIN Teachers c ON a.teacher_id = c.teacher_id"
+                     " where classcourse_id=%s", (idClassCourse, ))
     data = mycursor.fetchall()
+
+    mycursor.close()
     return render_template('ClassCourse/panel.html', response=data)
 
 @appClassCourse.route('/<idClassCourse>')
@@ -85,16 +87,24 @@ def editTeacherClass(idClassCourse):
         return "Bạn không có quyền vào trang này. Nếu lỗi liên hệ admin."
 
     mycursor = mydb.cursor()
-    mycursor.execute("SELECT idClassCourse, codeClassCourse, nameCourse, CONCAT(course_code,' - ', nameCourse), CONCAT(c.lastnameTeacher, ' ',c.firstnameTeacher)"
-                     " FROM ClassCourse a"
-                     " LEFT JOIN Courses b ON b.idCourse = a.idCourse"
-                     " LEFT JOIN Teachers c ON c.idTeacher = a.idTeacher"
-                     " where idClassCourse=%s", (idClassCourse, ))
+    
+    query = """
+            SELECT classcourse_id, classcourse_code, course_name, CONCAT(course_code,' - ', course_name), CONCAT(c.lastnameTeacher, ' ',c.firstnameTeacher),
+                DATE_FORMAT(a.dateStart, '%d-%m-%Y'),
+                DATE_FORMAT(a.dateEnd, '%d-%m-%Y')
+            FROM ClassCourse a
+            LEFT JOIN Courses b ON b.course_id = a.course_id
+            LEFT JOIN Teachers c ON c.teacher_id = a.teacher_id
+            where classcourse_id = %(teacher_id)s
+        """
+    mycursor.execute(query, {'teacher_id': idClassCourse})
     data = mycursor.fetchone()
     print(data)
+
     menus = get_menu(session.get('idPerm'))
     
-    return render_template('ClassCourse/index_course.html', title=data[2], response=data, idPerm=session.get('idPerm'), menus=menus)
+    mycursor.close()
+    return render_template('ClassCourse/classscourse_dashboard.html', title=data[2], response=data, idPerm=session.get('idPerm'), menus=menus)
 
 
 @appClassCourse.route('/<idClassCourse>/project')
@@ -103,16 +113,27 @@ def ProjectClassCourse(idClassCourse):
         return redirect(url_for('appAuth.Login'))
     if 'idPerm' not in session:
         return "Bạn không có quyền vào trang này. Nếu lỗi liên hệ admin."
-    
+
+    if session['idPerm'] == 4:
+        mycursor = mydb.cursor()
+        mycursor.execute("SELECT project_id FROM Projects WHERE student_code = %s AND classcourse_id = %s LIMIT 1", 
+                         (session['student_code'], idClassCourse))
+        project = mycursor.fetchone()
+        
+        if project:
+            return redirect('/project/' + str(project['project_id']))
+        else:
+            return "Không tìm thấy dự án cho khóa học này."
+
     mycursor = mydb.cursor()
-    mycursor.execute("SELECT idClassCourse, codeClassCourse, nameCourse, CONCAT(course_code,' - ', nameCourse), CONCAT(c.lastnameTeacher, ' ',c.firstnameTeacher)"
-                     " FROM ClassCourse a"
-                     " LEFT JOIN Courses b ON b.idCourse = a.idCourse"
-                     " LEFT JOIN Teachers c ON c.idTeacher = a.idTeacher"
-                     " where idClassCourse=%s", (idClassCourse, ))
-    data = mycursor.fetchone()
+    mycursor.execute("SELECT a.project_id, a.nameProject, CONCAT(b.student_code, ' - ', b.lastnameStudent, ' ', b.firstnameStudent) as infoStudent, a.project_status"
+                     " FROM Projects a"
+                     " LEFT JOIN Students b ON a.student_code = b.student_code"
+                     " WHERE classcourse_id=%s", (idClassCourse, ))
+    data = mycursor.fetchall()
     print(data)
 
-    role = session.get('idPerm')
+    menus = get_menu(session.get('idPerm'))
 
-    return render_template('ClassCourse/index_course.html', title=data[2], response=data, idPerm=session.get('idPerm'))
+    mycursor.close()
+    return render_template('ClassCourse/classscourse_project.html', title=data[2], response=data, idPerm=session.get('idPerm'), menus=menus)

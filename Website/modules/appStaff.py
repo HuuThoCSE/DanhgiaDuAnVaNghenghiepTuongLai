@@ -29,7 +29,7 @@ def TeacherStaff():
     if session.get('idPerm') != 2:
         return "Bạn không có quyền vào trang này. Nếu lỗi liên hệ admin."
     mycursor = mydb.cursor()
-    mycursor.execute("SELECT IdTeacher, CONCAT(lastnameTeacher,' ',firstnameTeacher), sex, birthday "
+    mycursor.execute("SELECT teacher_id, CONCAT(lastnameTeacher,' ',firstnameTeacher), sex, birthday "
                     " from Teachers")
     data = mycursor.fetchall()    
     
@@ -37,7 +37,7 @@ def TeacherStaff():
 
 def loadTeacher():
     mycursor = mydb.cursor()
-    mycursor.execute("SELECT IdTeacher, CONCAT(lastnameTeacher,' ',firstnameTeacher) from Teachers")
+    mycursor.execute("SELECT teacher_id, CONCAT(lastnameTeacher,' ',firstnameTeacher) from Teachers")
     data = mycursor.fetchall()  
     return data
 
@@ -77,10 +77,10 @@ def ListClassStaff():
         return "Bạn không có quyền vào trang này. Nếu lỗi liên hệ admin."
 
     mycursor = mydb.cursor()
-    mycursor.execute("SELECT a.idClassCourse, a.codeClassCourse, CONCAT(b.codeCourse,' - ',b.nameCourse) as fullnameClassCourse, CONCAT(c.lastnameTeacher, ' ',c.firstnameTeacher)"
+    mycursor.execute("SELECT a.ClassCourse_id, a.classCourse_code, CONCAT(b.course_code,' - ',b.course_name) as fullnameClassCourse, CONCAT(c.lastnameTeacher, ' ',c.firstnameTeacher)"
                      " FROM Classcourse a"
-                     " LEFT JOIN Courses b ON a.idCourse = b.idCourse"
-                     " LEFT JOIN Teachers c ON a.idTeacher = c.idTeacher")
+                     " LEFT JOIN Courses b ON a.course_id = b.course_id"
+                     " LEFT JOIN Teachers c ON a.teacher_id = c.teacher_id")
     data = mycursor.fetchall()  
     
     return render_template('staff/staff_listclass.html', response=data)
@@ -97,7 +97,7 @@ def ProjectProposalStaff():
     data = None
     try:
         mycursor = mydb.cursor()
-        query = ("SELECT a.proposal_id, a.proposal_title, CONCAT(a.course_code, ' - ', b.nameCourse), "
+        query = ("SELECT a.proposal_id, a.proposal_title, CONCAT(a.course_code, ' - ', b.course_name), "
                  "CONCAT(lastnameTeacher, ' ', firstnameTeacher), proposal_status, DATE_FORMAT(datetimeProposal, '%H:%i:%s %d-%m-%Y'), DATE_FORMAT(datetimeApproved, '%H:%i:%s %d-%m-%Y') "
                  "FROM projectproposal a "
                  "LEFT JOIN Courses b ON b.course_code = a.course_code "
@@ -113,6 +113,7 @@ def ProjectProposalStaff():
         if mycursor:
             mycursor.close()
     return render_template('staff/project-proposals.html', title="Đề xuất đồ án", response=data)
+
 
 @appStaff.route('/project-proposals/approve/<int:projectproposals_id>', methods=['POST'])
 def project_proposals(projectproposals_id):
