@@ -304,9 +304,17 @@
                             {% endif %}
                         </div>
                         <div class="card-body">
-                            <div class="row">
-                                
-                            </div>
+                                {% for item in project_list %}
+
+                                <div class="card mt-2">
+                                    <div class="card-header">
+                                        <h3><b>{{item.5}} | {{item.3}}</b></h3>
+                                    </div>
+                                    <div class="card-body">
+                                        {{item.4}}
+                                    </div>
+                                </div>
+                                {% endfor %}
                         </div>
                     </div>
 
