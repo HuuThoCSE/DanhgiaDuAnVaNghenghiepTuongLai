@@ -282,7 +282,7 @@
                                     <thead>
                                         <tr>
                                             <th scope="col">ID</th>
-                                            <th scope="col">Tên đề tài</th>
+                                            <th scope="col">Nội dung đề xuất</th>
                                             <th scope="col">Tình trạng</th>
                                             <th scope="col">Ngày đề xuất</th>
                                             <th scope="col">Ngày duyệt</th>
@@ -295,7 +295,10 @@
                                                 <td><b>{{item.0}}</td>
                                                 <td>
                                                     <a style="text-decoration: none;">
-                                                        {{item.1}}<br>
+                                                        <b>Tên đề tài:</b> {{item.1}}<br>
+                                                        {% if item.5 != None %}
+                                                            <b>Sinh viên đề xuất:</b> {{item.5}} <br>
+                                                        {% endif %}
                                                         <b>{{item.6}}</b> <br>
                                                         GV: <b>{{item.7}}</b>
                                                     </a>
@@ -309,8 +312,8 @@
                                                         <span class="badge badge-warning">Eject</span>
                                                     {% endif %}
                                                 </td>
-                                                <td>{{item.5}}</td>
-                                                <td>{{item.6}}</td>
+                                                <td>{{item.8}}</td>
+                                                <td>{{item.10}}</td>
                                                 <td>
                                                     {% if item.4 != '1' %}
                                                         <form action="/staff/project-proposals/approve/{{item.0}}" method="post" style="display: inline;">

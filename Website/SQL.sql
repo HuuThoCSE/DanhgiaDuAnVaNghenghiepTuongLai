@@ -102,8 +102,8 @@ CREATE TABLE Staffs (
 CREATE TABLE Students (
     student_id INT AUTO_INCREMENT,
     student_code VARCHAR(8),
-    lastnameStudent VARCHAR(100),
-    firstnameStudent VARCHAR(100),
+    student_lastname VARCHAR(100),
+    student_firstname VARCHAR(100),
     account_id INT,
     industry_id INT,
     CONSTRAINT PK_Students PRIMARY KEY (student_id, student_code),
@@ -164,11 +164,11 @@ CREATE TABLE Projects (
     project_status TINYINT DEFAULT 0,
     dateStart date NULL,
     dateEnd date NULL,
-    classcourse_id INT NULL,
+    classcourse_code varchar(50),
     teacher_code VARCHAR(8),
     student_code VARCHAR(8),
     typeProject char(3), -- Team or individual
-    FOREIGN KEY (classcourse_id) REFERENCES ClassCourse (classcourse_id),
+    FOREIGN KEY (classcourse_code) REFERENCES ClassCourse (classcourse_code),
     FOREIGN KEY (teacher_code) REFERENCES Teachers (teacher_code)
     -- FOREIGN KEY (student_code) REFERENCES Students (student_code)
 ) ENGINE=InnoDB;
@@ -216,12 +216,25 @@ CREATE TABLE hisStudentDream (
 --     REFERENCES Courses(CodeCourse);
 
 CREATE TABLE ErollClassCourse (
-    student_id INT,
-    classcourse_id INT,
+    student_code VARCHAR(8),
+    classcourse_code varchar(50),
     semester_code varchar(3),
-    PRIMARY KEY (student_id, classcourse_id),
-    FOREIGN KEY (student_id) REFERENCES Students (student_id),
-    FOREIGN KEY (classcourse_id) REFERENCES ClassCourse (classcourse_id)
+    PRIMARY KEY (student_code, classcourse_code),
+    FOREIGN KEY (student_code) REFERENCES Students (student_code),
+    FOREIGN KEY (classcourse_code) REFERENCES ClassCourse (classcourse_code)
+) ENGINE=InnoDB;
+
+
+CREATE TABLE ProjectProgress (
+    ProjectProgress_id INT AUTO_INCREMENT,
+    project_id INT,
+    student_code VARCHAR(8),
+    milestone_name VARCHAR(255),
+    milestone_description TEXT,
+    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT PK_ProjectProgress PRIMARY KEY (ProjectProgress_id),
+    FOREIGN KEY (project_id) REFERENCES Projects (project_id),
+    FOREIGN KEY (student_code) REFERENCES Students (student_code)
 ) ENGINE=InnoDB;
 
 INSERT INTO Semesters (semester_code, nameSemester, yearSemester) VALUES 
@@ -263,7 +276,7 @@ INSERT INTO Staffs (staff_code, firstnameStaff, lastnameStaff, account_id)
     VALUES
         ('ST1', 'Van A', 'Nguyen', 2);
 
-INSERT INTO Students (student_code, firstnameStudent, lastnameStudent, industry_id, account_id)
+INSERT INTO Students (student_code, student_firstname, student_lastname, industry_id, account_id)
     VALUES
         ('21022002', 'Thư', 'Âu Thị Anh', 1,  11),
         ('21022008', 'Thọ', 'Nguyễn Hữu', 1,  3),
@@ -298,39 +311,40 @@ INSERT INTO ClassCourse (classcourse_code, dateStart, dateEnd, course_code, seme
         ('222_1TH1391_KS2A_tructiep', '2023-03-11', '2023-06-30', 'TH1391', '222', 6),
         ('232_1TH1382_KS2A_tructiep', '2024-03-11', '2024-06-30', 'TH1382', '232', 6);
 
-INSERT INTO Projects (nameProject, description, teacher_code, classcourse_id, student_code, typeProject)
+INSERT INTO Projects (nameProject, description, teacher_code, classcourse_code, student_code, typeProject)
     VALUES
-        ('Phát hiện và khoanh vùng khối u não', '', 'GV1', 1, '21022002', 'ind'),
-        ('Hệ thống quản lý đồ án và phân loại chủ đề đồ án công nghệ thông tin', 'Website quản lý đồ án sinh viên thông qua các giao diện', 'GV1', 1, '21022008', 'ind'),
-        ('Nhận diện khuôn mặt', '', 'GV5', 2, '21022008', 'ind'),
-        ('Thiết kế và thực hiện mạch cân bằng Arduino cho quadcopter', '', 'GV1', 1, '21022007', 'ind'),
-        ('Phát hiện khối u não', '', 'GV6', 3, '21022008', 'tea'),
-        ('Phát hiện vật thể bằng YOLOv8 trên website', '', 'GV1', 1, '21022006', 'ind');
+        ('Phát hiện và khoanh vùng khối u não', '', 'GV1', '232_1TH1510_KS3A_01_ngoaigio', '21022002', 'ind'),
+        ('Hệ thống quản lý đồ án và phân loại chủ đề đồ án công nghệ thông tin', 'Website quản lý đồ án sinh viên thông qua các giao diện', 'GV1', '232_1TH1510_KS3A_01_ngoaigio', '21022008', 'ind'),
+        ('Nhận diện khuôn mặt', '', 'GV5', '233_1SP1418_KS1A_tructiep', '21022008', 'ind'),
+        ('Thiết kế và thực hiện mạch cân bằng Arduino cho quadcopter', '', 'GV1', '232_1TH1510_KS3A_01_ngoaigio', '21022007', 'ind'),
+        ('Phát hiện khối u não', '', 'GV6', '231_1TH1507_KS3A_04_ngoaigio', '21022008', 'tea'),
+        ('Phát hiện vật thể bằng YOLOv8 trên website', '', 'GV1', '232_1TH1510_KS3A_01_ngoaigio', '21022006', 'ind');
 
-INSERT INTO ErollClassCourse (student_id, classcourse_id, semester_code)
+INSERT INTO ErollClassCourse (student_code, classcourse_code, semester_code)
     VALUES
-        (2, 1, '232'),
-        (2, 5, '232');
+        ('21022008', '232_1TH1510_KS3A_01_ngoaigio', '232'),
+        ('21022008', '232_1TH1382_KS2A_tructiep', '232'),
+        ('21022002', '232_1TH1510_KS3A_01_ngoaigio', '232');
 
 INSERT INTO TeamProjects (project_id, student_id)
     VALUES
         (4, 2),
         (4, 3);
 
-INSERT INTO ProjectProposal (proposal_title, teacher_code, course_code, semester_code)
+INSERT INTO ProjectProposal (proposal_title, teacher_code, course_code, semester_code, teacherApproved_status)
     VALUES
-        ("Thiết lập Captive Portal trên OPNPfsense", "GV2", "TH1510", '232'),
-        ("Áp dụng Ansible để tự động hoá cấu hình thiết bị mạng", "GV2", "TH1510", '232'),
-        ("Phát hiện tấn công mạng bằng máy học", "GV2", "TH1510", '232'),
-        ("Các mô hình học sâu (Deep Learning) sử dụng cho phát hiện xâm nhập mạng", "GV2", "TH1510", '232'),
-        ("Phát hiện mã độc dựa vào học máy và thông tin PE Header", "GV2", "TH1510", '232'),
-        ("PHÁT HIỆN TẤN CÔNG SQL INJECTION BẰNG HỌC MÁY", "GV2", "TH1510", '232'),
-        ("Web Application Firewalls (NGINX ModSecurity)", "GV2", "TH1510", '232'),
-        ("Web Application Firewalls (open-appsec)", "GV2", "TH1510", '232'),
-        ("Web Application Firewalls (Naxsi)", "GV2", "TH1510", '232'),
-        ("Web Application Firewalls (Shadow Daemon)", "GV2", "TH1510", '232'),
-        ("Web Application Firewalls (IronBee)", "GV2", "TH1510", '232'),
-        ("Web Application Firewalls (Lua-resty-WAF)", "GV2", "TH1510", '232');
+        ("Thiết lập Captive Portal trên OPNPfsense", "GV2", "TH1510", '232', 1),
+        ("Áp dụng Ansible để tự động hoá cấu hình thiết bị mạng", "GV2", "TH1510", '232', 1),
+        ("Phát hiện tấn công mạng bằng máy học", "GV2", "TH1510", '232', 1),
+        ("Các mô hình học sâu (Deep Learning) sử dụng cho phát hiện xâm nhập mạng", "GV2", "TH1510", '232', 1),
+        ("Phát hiện mã độc dựa vào học máy và thông tin PE Header", "GV2", "TH1510", '232', 1),
+        ("PHÁT HIỆN TẤN CÔNG SQL INJECTION BẰNG HỌC MÁY", "GV2", "TH1510", '232', 1),
+        ("Web Application Firewalls (NGINX ModSecurity)", "GV2", "TH1510", '232', 1),
+        ("Web Application Firewalls (open-appsec)", "GV2", "TH1510", '232', 1),
+        ("Web Application Firewalls (Naxsi)", "GV2", "TH1510", '232', 1),
+        ("Web Application Firewalls (Shadow Daemon)", "GV2", "TH1510", '232', 1),
+        ("Web Application Firewalls (IronBee)", "GV2", "TH1510", '232', 1),
+        ("Web Application Firewalls (Lua-resty-WAF)", "GV2", "TH1510", '232', 1);
  
 INSERT INTO TemplProject (nameTemlProject, CodeCourse)
     VALUES

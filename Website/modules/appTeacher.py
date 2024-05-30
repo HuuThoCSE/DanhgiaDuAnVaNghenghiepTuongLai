@@ -53,7 +53,7 @@ def ListClassTeacher():
     
     mycursor.execute("SELECT a.classcourse_id, a.classcourse_code, CONCAT(b.course_code,' - ',b.course_name) as fullnameClassCourse, CONCAT(c.lastnameTeacher, ' ',c.firstnameTeacher)"
                      " FROM Classcourse a"
-                     " LEFT JOIN Courses b ON a.course_id = b.course_id"
+                     " LEFT JOIN Courses b ON a.course_code = b.course_code"
                      " LEFT JOIN Teachers c ON a.teacher_id = c.teacher_id"
                      " WHERE c.teacher_id=%s", (session.get('idTeacher'), ))
     data = mycursor.fetchall()  
@@ -64,7 +64,7 @@ def ListClassTeacher():
 def ListProjectTeacher(nbr):
     idClassCourse = nbr
     mycursor = mydb.cursor()
-    mycursor.execute("SELECT a.idProject, a.nameProject, CONCAT(b.codeStudent, ' - ', b.lastnameStudent, ' ', b.firstnameStudent) as infoStudent, a.idClassCourse"
+    mycursor.execute("SELECT a.idProject, a.nameProject, CONCAT(b.codeStudent, ' - ', b.student_lastname, ' ', b.student_firstname) as infoStudent, a.idClassCourse"
                      " FROM Projects a"
                      " LEFT JOIN Students b ON a.IdLeader = b.IdStudent"
                      " WHERE idClassCourse=%s", (idClassCourse, ))
@@ -86,13 +86,13 @@ def ClassProjectTeacher(nbr):
                      " where idClassCourse=%s", (idClassCourse, ))
     data = mycursor.fetchone()    
     print(data)
-    return render_template('teacher/project_class.html', title = data[1], response=data, dataclass=idClassCourse)
+    return render_template('teacher/project_class.html', title = data[1], response=data, dataclass=idClassCourse, idPerm=session.get('idPerm'))
 
 # @appTeacher.route('class/<nbr>/Project')
 # def ProjectTeacher(nbr):
 #     idProject = nbr
 #     mycursor = mydb.cursor()
-#     mycursor.execute("SELECT a.idProject, a.nameProject, CONCAT(b.codeStudent, ' - ', b.lastnameStudent, ' ', b.firstnameStudent) as infoStudent"
+#     mycursor.execute("SELECT a.idProject, a.nameProject, CONCAT(b.codeStudent, ' - ', b.student_lastname, ' ', b.student_firstname) as infoStudent"
 #                      " FROM Projects a"
 #                      " LEFT JOIN Students b ON a.IdLeader = b.IdStudent"
 #                      " WHERE idProject=%s", (idProject, ))
@@ -104,7 +104,7 @@ def PanelProjectTeacher(idclass, idproject):
     idClass = idclass
     idProject = idproject
     mycursor = mydb.cursor()
-    mycursor.execute("SELECT a.idProject, a.nameProject, CONCAT(b.codeStudent, ' - ', b.lastnameStudent, ' ', b.firstnameStudent) as infoStudent"
+    mycursor.execute("SELECT a.idProject, a.nameProject, CONCAT(b.codeStudent, ' - ', b.student_lastname, ' ', b.student_firstname) as infoStudent"
                      " FROM Projects a"
                      " LEFT JOIN Students b ON b.student_code = a.leader_code"
                      " WHERE idProject=%s", (idProject, ))
@@ -121,11 +121,13 @@ def ProjectProposals():
 
     teacher_id = session.get('idTeacher')
     query = """
-            SELECT a.proposal_id, a.proposal_title, a.proposal_description, a.staffApproved_status,
+            SELECT a.proposal_id, a.proposal_title, a.proposal_description, a.teacherApproved_status, a.staffApproved_status,
                 CONCAT(c.course_code, ' - ', c.course_name),
+                CONCAT(s.student_code, ' - ', s.student_lastname, ' ', s.student_firstname),
                 DATE_FORMAT(a.datetimeProposal, '%H:%i:%s %d-%m-%Y'),
-                DATE_FORMAT(a.staffApproved_datetime, '%H:%i:%s %d-%m-%Y')
+                DATE_FORMAT(a.teacherApproved_datetime, '%H:%i:%s %d-%m-%Y')
             FROM ProjectProposal a
+            LEFT JOIN Students s ON a.student_code = s.student_code
             LEFT JOIN Teachers b ON a.teacher_code = b.teacher_code
             LEFT JOIN Courses c ON a.course_code = c.course_code
             WHERE b.teacher_id = %(teacher_id)s
@@ -135,7 +137,7 @@ def ProjectProposals():
 
     print(data)
 
-    return render_template('teacher/project_proposals.html', title="Đề xuất Đề tài", response=data)
+    return render_template('teacher/project_proposals.html', title="Đề xuất Đề tài", response=data, idPerm=session.get('idPerm'))
 
 @appTeacher.route('/project-proposals/create', methods=['GET', 'POST'])
 def CreateProjectProposals():
@@ -152,9 +154,9 @@ def CreateProjectProposals():
             semester_code = request.form['semester_code']
             teacher_code = session.get('teacher_code')
             
-            query = ("INSERT INTO ProjectProposal (proposal_title, proposal_description, course_code, teacher_code, semester_code)"
+            query = ("INSERT INTO ProjectProposal (proposal_title, proposal_description, course_code, teacher_code, semester_code, staffApproved_status)"
                      " VALUES (%s, %s, %s, %s, %s)")
-            values = (proposal_title, proposal_description, course_code, teacher_code, semester_code)
+            values = (proposal_title, proposal_description, course_code, teacher_code, semester_code, 1)
             mycursor.execute(query, values)
             mydb.commit()
 
@@ -170,7 +172,7 @@ def CreateProjectProposals():
     mycursor.execute("SELECT semester_code, CONCAT(semester_code, ' - Học kỳ ', nameSemester, ', ', yearSemester) from Semesters")
     semesters = mycursor.fetchall()
 
-    return render_template('teacher/project_createproposal.html', courses=courses, semesters=semesters)
+    return render_template('teacher/project_proposal_create.html', courses=courses, semesters=semesters, idPerm=session.get('idPerm'))
 
 @appTeacher.route('/project-proposals/modify/<int:proposal_id>', methods=['GET', 'POST'])
 def ModifyProposalTeacher(proposal_id):
@@ -219,4 +221,20 @@ def ModifyProposalTeacher(proposal_id):
     mycursor.execute("SELECT semester_code, CONCAT(semester_code, ' - Học kỳ ', nameSemester, ', ', yearSemester) from Semesters")
     semesters = mycursor.fetchall()
     
-    return render_template('teacher/project_proposal_modify.html', data=data, courses=courses, semesters=semesters)
+    return render_template('teacher/project_proposal_modify.html', data=data, courses=courses, semesters=semesters, idPerm=session.get('idPerm'))
+
+@appTeacher.route('/project-proposals/approve/<int:projectproposals_id>', methods=['POST'])
+def project_proposals(projectproposals_id):
+    if request.method == 'POST':
+        mycursor = None
+        try:
+            mycursor = mydb.cursor()
+            query = ("UPDATE projectproposal SET teacherApproved_status = 1, teacherApproved_datetime = NOW(), teacherApproved=%s where proposal_id=%s")
+            values = (session.get('staff_code'), projectproposals_id, )
+            mycursor.execute(query, values)
+            mydb.commit()
+            mycursor.close()
+        except Exception as e:
+                print('An error occurred: ' + str(e), 'error')  # 'error' is a category
+                return str(e), 500
+        return redirect(url_for('appTeacher.ProjectProposals'))

@@ -39,6 +39,9 @@ def Login():
                 session['loggedin'] = True
                 session['idAccount'] = result[0]
                 session['idPerm'] = result[3]
+                
+                print("ID Account:", session.get('idAccount'))
+                print("Quyền:", session.get('idPerm'))
 
                 if session.get('idPerm') == 2: # Staff
                     mycursor.execute("SELECT staff_id, staff_code from Staffs where account_id=%s", (result[0], ))

@@ -226,19 +226,18 @@
                             </div> -->
                         </li>
 
-                    
-
                         <!-- Nav Item - User Information -->
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <!-- <span class="mr-2 d-none d-lg-inline text-gray-600 small">Douglas McGee</span> -->
-                                <img class="img-profile rounded-circle border" src="/statics/gif/professor.gif">
+                                <img class="img-profile rounded-circle border" src="/statics/gif/{{ 'businessman' if idPerm == 2 else 'professor' if idPerm == 3 else 'student' if idPerm == 4 else 'default' }}.gif">
                             </a>
+
                             <!-- Dropdown - User Information -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                                 aria-labelledby="userDropdown">
-                                <a class="dropdown-item" href="/teacher/profile">
+                                <a class="dropdown-item" href="/{{ 'staff' if idPerm == 2 else 'teacher' if idPerm == 3 else 'student' if idPerm == 4 else '' }}/profile">
                                     <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                                     My Profile
                                 </a>
@@ -285,11 +284,9 @@
                                     <thead>
                                         <tr>
                                             <th scope="col">ID</th>
-                                            <th scope="col">Tên đồ án</th>
+                                            <th scope="col">Thông tin đề xuất</th>
                                             <th scope="col">Ngày đề xuất</th>
-                                            <th scope="col">Ngày duyệt</th>
-                                            <th scope="col">Tình trạng</th>
-                                            <th scope="col">Thao tác</th>
+                                            <!-- <th scope="col">Thao tác</th> -->
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -297,25 +294,34 @@
                                             <tr>
                                                 <td><b>{{item.0}}</td>
                                                 <td>
-                                                    <a href="/teacher/project-proposals/{{item.0}}" style="text-decoration: none;">
-                                                        {{item.1}}<br>
-                                                        <b>{{item.4}}</b> <br>
+                                                    <!-- <a href="/teacher/project-proposals/{{item.0}}" style="text-decoration: none;"> -->
+                                                    <a style="text-decoration: none;">
+                                                        <b>Tên đồ án:</b> {{item.1}}<br>
+                                                        <b>Mô tả:</b> {{item.2}} <br>
+                                                        <b>Giảng viên duyệt</b>:
+                                                        {% if item.3 == '0' %}
+                                                            <span class="badge badge-warning">Pending</span>
+                                                        {% elif item.3 == '1' %}
+                                                            <span class="badge badge-success">Approach</span>
+                                                        {% elif item.3 == '2' %}
+                                                            <span class="badge badge-warning">Eject</span>
+                                                        {% endif %}
+                                                        <br>
+
+                                                        <b>Trưởng khoa duyệt</b>:
+                                                        {% if item.4 == '0' %}
+                                                            <span class="badge badge-warning">Pending</span>
+                                                        {% elif item.4 == '1' %}
+                                                            <span class="badge badge-success">Approach</span>
+                                                        {% elif item.4 == '2' %}
+                                                            <span class="badge badge-warning">Eject</span>
+                                                        {% endif %}
                                                     </a>
                                                 </td>
-                                                <td>{{item.5}}</td>
                                                 <td>{{item.6}}</td>
-                                                <td> 
-                                                    {% if item.3 == '0' %}
-                                                        <span class="badge badge-warning">Pending</span>
-                                                    {% elif item.3 == '1' %}
-                                                        <span class="badge badge-success">Approach</span>
-                                                    {% elif item.3 == '2' %}
-                                                        <span class="badge badge-warning">Eject</span>
-                                                    {% endif %}
-                                                </td>
-                                                <td>
-                                                    <a href="/teacher/project-proposals/modify/{{item.0}}" class="btn btn-primary btn-xs">Chỉnh sửa</a>
-                                                </td>
+                                                <!-- <td> -->
+                                                    <!-- <a href="/teacher/project-proposals/modify/{{item.0}}" class="btn btn-primary btn-xs">Chỉnh sửa</a> -->
+                                                <!-- </td> -->
                                             </tr>
                                         {% endfor %}
                                     </tbody>

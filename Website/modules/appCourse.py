@@ -79,8 +79,24 @@ def TeacherClass(nbr):
     mycursor.close()
     return render_template('ClassCourse/panel.html', response=data)
 
-@appClassCourse.route('/<idClassCourse>')
+@appClassCourse.route('/<idClassCourse>', methods=['GET', 'POST'])
 def editTeacherClass(idClassCourse):
+
+    if request.method == 'POST':
+        mycursor = mydb.cursor()
+        query = """
+                SELECT project_id FROM Projects WHERE classcourse_code = (SELECT classcourse_code FROM ClassCourse WHERE ClassCourse_id = %(idClassCourse)s) AND student_code = %(student_code)s
+                """
+        mycursor.execute(query, {'idClassCourse': idClassCourse, 'student_code': session.get('student_code')})
+        data = mycursor.fetchone()  # Chỉ lấy một kết quả vì chúng ta mong đợi chỉ có một dự án
+
+        if data:
+            project_id = data[0]  # Lấy giá trị project_id từ tuple
+            return redirect(url_for('appProject.infoProject', project_id=project_id))
+        else:
+            # Xử lý khi không tìm thấy dự án
+            return "No project found for the given class course and student."
+
     if 'loggedin' not in session:
         return redirect(url_for('appAuth.Login'))
     if 'idPerm' not in session:
@@ -115,7 +131,7 @@ def ProjectClassCourse(idClassCourse):
 
     if session['idPerm'] == 4:
         mycursor = mydb.cursor()
-        mycursor.execute("SELECT project_id FROM Projects WHERE student_code = %s AND classcourse_id = %s LIMIT 1", 
+        mycursor.execute("SELECT project_id FROM Projects WHERE student_code = %s AND classcourse_code = (select classcourse_code from ClassCourse where classcourse_id = %s) LIMIT 1", 
                          (session['student_code'], idClassCourse))
         project = mycursor.fetchone()
         
@@ -125,10 +141,10 @@ def ProjectClassCourse(idClassCourse):
             return "Không tìm thấy dự án cho khóa học này."
 
     mycursor = mydb.cursor()
-    mycursor.execute("SELECT a.project_id, a.nameProject, CONCAT(b.student_code, ' - ', b.lastnameStudent, ' ', b.firstnameStudent) as infoStudent, a.project_status"
+    mycursor.execute("SELECT a.project_id, a.nameProject, CONCAT(b.student_code, ' - ', b.student_lastname, ' ', b.student_firstname) as infoStudent, a.project_status"
                      " FROM Projects a"
                      " LEFT JOIN Students b ON a.student_code = b.student_code"
-                     " WHERE classcourse_id=%s", (idClassCourse, ))
+                     " WHERE classcourse_code = (select classcourse_code from ClassCourse where classcourse_id = %s)", (idClassCourse, ))
     data = mycursor.fetchall()
     print(data)
 
@@ -160,9 +176,7 @@ def ProjectProposals(classcourse_id):
     mycursor.execute(query, {'classcourse_id': classcourse_id})
     data = mycursor.fetchall()
 
-    print(data)
-
-    return render_template('ClassCourse/project_proposals.html', title="Đề xuất Đề tài", response=data)
+    return render_template('ClassCourse/project_proposals.html', title="Đề xuất Đề tài", response=data, idPerm=session.get('idPerm'))
 
 @appClassCourse.route('/<int:classcourse_id>/project-proposals/create', methods=['GET', 'POST'])
 def CreateProjectProposals(classcourse_id):
@@ -221,4 +235,4 @@ def CreateProjectProposals(classcourse_id):
 
         print(courses)
 
-        return render_template('ClassCourse/project_proposal_create.html', courses=courses)
+        return render_template('ClassCourse/project_proposal_create.html', courses=courses, idPerm=session.get('idPerm'))

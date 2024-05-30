@@ -295,20 +295,22 @@
                         </div>
                     </div>
 
+                    {% if idPerm == 3 or idPerm == 4 %}
                     <div class="card mt-2">
                         <div class="card-header">
-                            <h1><b>ĐỒ ÁN LỚP HỌC</b></h1>
+                            <h1><b>BÁO CÁO TIẾN ĐỘ</b>
+                            {% if idPerm == 4 %}
+                                <button class="btn btn-primary btn-xs ml-2" data-toggle="modal" data-target="#exampleModalCenter">Thêm báo cáo tiến độ</button></h1>
+                            {% endif %}
                         </div>
                         <div class="card-body">
                             <div class="row">
-                                {% if idPerm == 3 %}
-                                <a href="/course/{{ response.0 }}/project" class="btn btn-primary">DANH SÁCH ĐỒ ÁN</a>
-                                {% elif idPerm == 4 %}
-                                <a href="/course/{{ response.0 }}/project/" class="btn btn-primary">ĐỒ ÁN CÁ NHÂN</a>
-                                {% endif %}
+                                
                             </div>
                         </div>
                     </div>
+
+                    {% endif %}
 
                 </div>
                 <!-- /.container-fluid -->
@@ -354,6 +356,47 @@
                     <a class="btn btn-primary" href="/logout">Đăng xuất</a>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h2 class="modal-title" id="exampleModalLongTitle">THÊM BÁO CÁO TIẾN ĐỘ</h2>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            </div>
+            <div class="modal-body">
+                <form method="POST">
+                    <label for="project_id">Project ID:</label>
+                    <input type="text" id="project_id" name="project_id" class="form-control" value="{{response.0}}" disabled><br>
+            
+                    <label for="milestone_name">Tên tiến độ:</label>
+                    <input type="text" id="milestone_name" name="milestone_name" class="form-control" required><br>
+            
+                    <label for="milestone_description">Nội dung tiến độ:</label>
+                    <textarea id="milestone_description" name="milestone_description" class="form-control" required></textarea><br>
+            
+                    <!-- <label for="status">Tình trạng:</label>
+                    <input type="text" id="status" name="status" class="form-control" required><br> -->
+            
+                    <!-- <label for="start_date">Start Date:</label>
+                    <input type="date" id="start_date" name="start_date" class="form-control" required><br>
+            
+                    <label for="end_date">End Date:</label>
+                    <input type="date" id="end_date" name="end_date" class="form-control" required><br> -->
+            
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+            <!-- <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary">Save changes</button>
+            </div> -->
+        </div>
         </div>
     </div>
 
