@@ -47,11 +47,11 @@ def profileStudent():
     if session.get('idPerm') != 4:
         return "Bạn không có quyền vào trang này. Nếu lỗi liên hệ admin."
 
-    mycursor.execute("SELECT username, codeStudent, CONCAT(lastnameStudent,' ',firstnameStudent) as fullname, nameIndustry"
+    mycursor.execute("SELECT username, student_code, CONCAT(lastnameStudent,' ',firstnameStudent) as fullname, industry_name_VNI"
                       " from Students"
-                      " INNER Join Account ON Students.idAccount = Account.idAccount"
-                      " INNER JOIN Industries ON Students.IdIndustry = Industries.IdIndustry"
-                      " where idStudent=%s", (session.get('idStudent'), ))
+                      " INNER Join Accounts ON Students.Account_id = Accounts.Account_id"
+                      " INNER JOIN Industries ON Students.Industry_id = Industries.Industry_id"
+                      " where student_id=%s", (session.get('idStudent'), ))
     data = mycursor.fetchall()
     
     print(data)
@@ -63,12 +63,11 @@ def ListClassStudent():
     if 'loggedin' not in session:
         return redirect(url_for('appAuth.Login'))
     
-    mycursor.execute("SELECT a.classcourse_id, b.classcourse_code, CONCAT(c.course_code,' - ',c.course_name) as fullnameClassCourse, CONCAT(d.lastnameTeacher, ' ',d.firstnameTeacher)"
+    mycursor.execute("SELECT distinct a.classcourse_id, b.classcourse_code, CONCAT(c.course_code,' - ',c.course_name) as fullnameClassCourse, CONCAT(d.lastnameTeacher, ' ',d.firstnameTeacher)"
                      " FROM ErollClassCourse a"
                      " LEFT JOIN ClassCourse b ON a.classcourse_id = b.classcourse_id"
-                     " LEFT JOIN Courses c ON b.course_id = c.course_id"
+                     " LEFT JOIN Courses c ON b.course_code = c.course_code"
                      " LEFT JOIN Teachers d ON b.teacher_id = d.teacher_id"
                      " WHERE student_id=%s", (session.get('idStudent'), ))
     data = mycursor.fetchall()
-
     return render_template('student/student_listclass.html', response=data)

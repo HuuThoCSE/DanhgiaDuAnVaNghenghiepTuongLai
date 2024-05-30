@@ -9,7 +9,9 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>SB Admin 2 - Dashboard</title>
+    {% if title %}
+        <title>{{title}}</title>
+    {% endif %}
 
     <!-- Custom fonts for this template -->
     <link href="/statics/style2/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -61,31 +63,30 @@
 
             <!-- Nav Item - Pages Collapse Menu -->
             <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseGiangvien"
-                    aria-expanded="true" aria-controls="collapseGiangvien">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
+                    aria-expanded="true" aria-controls="collapseTwo">
                     <i class="fas fa-fw fa-cog"></i>
-                    <span>Giảng viên</span>
+                    <span>Lớp đồ án</span>
                 </a>
-                <div id="collapseGiangvien" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Quản lý giảng viên</h6>
-                        <a class="collapse-item" href="/staff/teacher">Danh sách giảng viên</a>
-                        <a class="collapse-item" href="/staff/teacher/add">Thêm giáo viên</a>
+                        <h6 class="collapse-header">Quản lý lớp đồ án:</h6>
+                        <a class="collapse-item" href="/teacher/class">Danh sách lớp đồ án</a>
                     </div>
                 </div>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseLophoc"
-                    aria-expanded="true" aria-controls="collapseLophoc">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseDoAn"
+                    aria-expanded="true" aria-controls="collapseDoAn">
                     <i class="fas fa-fw fa-cog"></i>
-                    <span>Lớp học</span>
+                    <span>Đề tài Đồ án</span>
                 </a>
-                <div id="collapseLophoc" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                <div id="collapseDoAn" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Quản lý lớp học</h6>
-                        <a class="collapse-item" href="/staff/ListClass">Danh sách lớp học</a>
-                        <!-- <a class="collapse-item" href="/staff/teacher/add">Thêm lớp học</a> -->
+                        <h6 class="collapse-header">Quản lý Đề tài đồ án</h6>
+                        <a class="collapse-item" href="/project-proposals">Danh sách Đề xuất Đề tài</a>
+                        <a class="collapse-item" href="/project-proposals/create">Thêm Đề xuất đề tài</a>
                     </div>
                 </div>
             </li>
@@ -237,10 +238,10 @@
                             <!-- Dropdown - User Information -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                                 aria-labelledby="userDropdown">
-                                <!-- <a class="dropdown-item" href="/staff/profile">
+                                <a class="dropdown-item" href="/teacher/profile">
                                     <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                                     My Profile
-                                </a> -->
+                                </a>
 
                                 <!-- <a class="dropdown-item" href="#">
                                     <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
@@ -263,11 +264,19 @@
                 </nav>
                 <!-- End of Topbar -->
 
-                <!-- Begin Page Content -->
                 <div class="container-fluid">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }}">{{ message }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
                     <div class="card shadow">
                         <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Danh sách Đề xuất đồ án</h6>
+                            <h6 class="m-0 font-weight-bold text-primary">Danh sách Đề xuất Đề tài đồ án</h6>
+                            <a class="btn btn-primary" href="project-proposals/create">Thêm Đề tài đê xuất</a>
                         </div>
 
                         <div class="card-body">
@@ -276,10 +285,10 @@
                                     <thead>
                                         <tr>
                                             <th scope="col">ID</th>
-                                            <th scope="col">Tên đề tài</th>
-                                            <th scope="col">Tình trạng</th>
+                                            <th scope="col">Tên đồ án</th>
                                             <th scope="col">Ngày đề xuất</th>
                                             <th scope="col">Ngày duyệt</th>
+                                            <th scope="col">Tình trạng</th>
                                             <th scope="col">Thao tác</th>
                                         </tr>
                                     </thead>
@@ -288,34 +297,24 @@
                                             <tr>
                                                 <td><b>{{item.0}}</td>
                                                 <td>
-                                                    <a href="class/{{item.0}}" style="text-decoration: none;">
+                                                    <a href="/teacher/project-proposals/{{item.0}}" style="text-decoration: none;">
                                                         {{item.1}}<br>
-                                                        <b>{{item.2}}</b> <br>
-                                                        GV: <b>{{item.3}}</b>
+                                                        <b>{{item.4}}</b> <br>
                                                     </a>
-                                                </td>
-                                                <td>
-                                                    {% if item.4 == '0' %}
-                                                        <span class="badge badge-warning">Pending</span>
-                                                    {% elif item.4 == '1' %}
-                                                        <span class="badge badge-success">Approach</span>
-                                                    {% elif item.4 == '2' %}
-                                                        <span class="badge badge-warning">Eject</span>
-                                                    {% endif %}
                                                 </td>
                                                 <td>{{item.5}}</td>
                                                 <td>{{item.6}}</td>
-                                                <td>
-                                                    {% if item.4 != '1' %}
-                                                        <form action="/project-proposals/approve/{{item.0}}" method="post" style="display: inline;">
-                                                            <button type="submit" class="btn btn-success btn-xs">Duyệt</button>
-                                                        </form>
+                                                <td> 
+                                                    {% if item.3 == '0' %}
+                                                        <span class="badge badge-warning">Pending</span>
+                                                    {% elif item.3 == '1' %}
+                                                        <span class="badge badge-success">Approach</span>
+                                                    {% elif item.3 == '2' %}
+                                                        <span class="badge badge-warning">Eject</span>
                                                     {% endif %}
-                                                    <form action="/project-proposals/reject/{{item.0}}" method="post" style="display: inline;">
-                                                        <button type="submit" class="btn btn-danger btn-xs">Từ chối</button>
-                                                    </form>
-                                                    <!-- <a href="/update/{{item.0}}" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#modaledit{{item.1}}">Edit</a> -->
-                                                    <!-- <a href="/delete/{{item.1}}" class="btn btn-danger btn-xs" onclick="return confirm('Are You Sure For Delete?')">Delete</a> -->
+                                                </td>
+                                                <td>
+                                                    <a href="/teacher/project-proposals/modify/{{item.0}}" class="btn btn-primary btn-xs">Chỉnh sửa</a>
                                                 </td>
                                             </tr>
                                         {% endfor %}

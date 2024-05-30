@@ -31,8 +31,8 @@ def profileTeacher():
 
     mycursor.execute("SELECT username, CONCAT(lastnameTeacher,' ', firstnameTeacher) as fullname"
                       " from Teachers"
-                      " INNER Join Account ON Teachers.idAccount = Account.idAccount"
-                      " where idTeacher=%s", (session.get('idTeacher'), ))
+                      " INNER Join Accounts ON Teachers.account_id = Accounts.account_id"
+                      " where teacher_id=%s", (session.get('idTeacher'), ))
     data = mycursor.fetchall()
     
     print(data)
@@ -121,14 +121,14 @@ def ProjectProposals():
 
     teacher_id = session.get('idTeacher')
     query = """
-            SELECT a.proposal_id, a.proposal_title, a.proposal_description, a.proposal_status,
+            SELECT a.proposal_id, a.proposal_title, a.proposal_description, a.staffApproved_status,
                 CONCAT(c.course_code, ' - ', c.course_name),
                 DATE_FORMAT(a.datetimeProposal, '%H:%i:%s %d-%m-%Y'),
-                DATE_FORMAT(a.datetimeApproved, '%H:%i:%s %d-%m-%Y')
+                DATE_FORMAT(a.staffApproved_datetime, '%H:%i:%s %d-%m-%Y')
             FROM ProjectProposal a
             LEFT JOIN Teachers b ON a.teacher_code = b.teacher_code
             LEFT JOIN Courses c ON a.course_code = c.course_code
-            WHERE b.idTeacher = %(teacher_id)s
+            WHERE b.teacher_id = %(teacher_id)s
         """
     mycursor.execute(query, {'teacher_id': teacher_id})
     data = mycursor.fetchall()
@@ -167,7 +167,7 @@ def CreateProjectProposals():
     mycursor.execute("SELECT course_code, CONCAT(course_code, ' - ', course_name) as fullnameCourse from Courses")
     courses = mycursor.fetchall()
 
-    mycursor.execute("SELECT semester_code, CONCAT(semester_code, ' - Học kỳ ', nameSemester, ', ', yearSemester) from Semester")
+    mycursor.execute("SELECT semester_code, CONCAT(semester_code, ' - Học kỳ ', nameSemester, ', ', yearSemester) from Semesters")
     semesters = mycursor.fetchall()
 
     return render_template('teacher/project_createproposal.html', courses=courses, semesters=semesters)
@@ -216,7 +216,7 @@ def ModifyProposalTeacher(proposal_id):
     mycursor.execute("SELECT course_code, CONCAT(course_code, ' - ', course_name) as fullnameCourse from Courses")
     courses = mycursor.fetchall()
     
-    mycursor.execute("SELECT semester_code, CONCAT(semester_code, ' - Học kỳ ', nameSemester, ', ', yearSemester) from Semester")
+    mycursor.execute("SELECT semester_code, CONCAT(semester_code, ' - Học kỳ ', nameSemester, ', ', yearSemester) from Semesters")
     semesters = mycursor.fetchall()
     
     return render_template('teacher/project_proposal_modify.html', data=data, courses=courses, semesters=semesters)

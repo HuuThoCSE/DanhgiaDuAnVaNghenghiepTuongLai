@@ -97,11 +97,16 @@ def ProjectProposalStaff():
     data = None
     try:
         mycursor = mydb.cursor()
-        query = ("SELECT a.proposal_id, a.proposal_title, CONCAT(a.course_code, ' - ', b.course_name), "
-                 "CONCAT(lastnameTeacher, ' ', firstnameTeacher), proposal_status, DATE_FORMAT(datetimeProposal, '%H:%i:%s %d-%m-%Y'), DATE_FORMAT(datetimeApproved, '%H:%i:%s %d-%m-%Y') "
-                 "FROM projectproposal a "
-                 "LEFT JOIN Courses b ON b.course_code = a.course_code "
-                 "LEFT JOIN Teachers c ON c.teacher_code = a.teacher_code")
+        query = """
+            SELECT a.proposal_id, a.proposal_title, a.proposal_description, a.teacherApproved_status, a.staffApproved_status, 
+                CONCAT(c.course_code, ' - ', c.course_name) AS course_info,
+                CONCAT(lastnameTeacher, ' ', firstnameTeacher) AS teacher_fullname,
+                DATE_FORMAT(a.datetimeProposal, '%H:%i:%s %d-%m-%Y') AS datetimeProposal,
+                DATE_FORMAT(a.teacherApproved_datetime, '%H:%i:%s %d-%m-%Y') AS teacherApproved_datetime,
+                DATE_FORMAT(a.staffApproved_datetime, '%H:%i:%s %d-%m-%Y') AS staffApproved_datetime
+            FROM ProjectProposal a
+            LEFT JOIN Teachers b ON a.teacher_code = b.teacher_code
+            LEFT JOIN Courses c ON a.course_code = c.course_code"""
         mycursor.execute(query)
         data = mycursor.fetchall()
         print(data)

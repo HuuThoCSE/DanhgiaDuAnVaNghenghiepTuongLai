@@ -61,10 +61,12 @@ def Login():
                     return redirect(url_for('appTeacher.DashboardTeacher'))
 
                 elif session.get('idPerm') == 4: # Student
-                    mycursor.execute("SELECT student_id from Students where account_id=%s", (result[0], ))
+                    mycursor.execute("SELECT student_id, student_code from Students where account_id=%s", (result[0], ))
                     result1 = mycursor.fetchone()
                     session['idStudent'] = result1[0]
+                    session['student_code'] = result1[1]
                     print(result1[0])
+                    print(result1[1])
                     mycursor.close()
                     return redirect(url_for('appStudent.DashboardStudent'))
                 else:

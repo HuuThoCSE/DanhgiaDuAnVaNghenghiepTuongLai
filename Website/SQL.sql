@@ -53,7 +53,7 @@ CREATE TABLE Accounts (
 
 CREATE TABLE Courses (
     course_id int AUTO_INCREMENT,
-    course_code varchar(6),
+    course_code VARCHAR(6),
     course_name TEXT,
     course_name_ENG text NULL,
     NumberLecture int,
@@ -119,26 +119,39 @@ CREATE TABLE ClassCourse (
     classcourse_code varchar(50),
     dateStart DATE,
     dateEnd DATE,
-    course_id INT,
+    course_code VARCHAR(6),
+    semester_code VARCHAR(3),
     teacher_id INT,
-    CONSTRAINT PK_ClassCourse PRIMARY KEY (classcourse_id, classcourse_code),
+    CONSTRAINT PK_ClassCourse PRIMARY KEY (classcourse_id),
     CONSTRAINT U_ClassCourse UNIQUE (classcourse_code),
-    FOREIGN KEY (course_id) REFERENCES Courses (course_id),
-    FOREIGN KEY (teacher_id) REFERENCES Teachers (teacher_id)
+    CONSTRAINT PK_ClassCourse_Courses
+        FOREIGN KEY (course_code) REFERENCES Courses (course_code),
+    CONSTRAINT PK_ClassCourse_Semesters
+        FOREIGN KEY (semester_code) REFERENCES Semesters (semester_code),
+    CONSTRAINT PK_ClassCourse_Teachers
+        FOREIGN KEY (teacher_id) REFERENCES Teachers (teacher_id)
 ) ENGINE=InnoDB;
     
 CREATE TABLE ProjectProposal (
     proposal_id INT AUTO_INCREMENT PRIMARY KEY,
     proposal_title VARCHAR(500),
     proposal_description TEXT NULL,
+    classcourse_code varchar(50),
+    student_code VARCHAR(8),
     teacher_code VARCHAR(3),
     course_code VARCHAR(6),
     semester_code VARCHAR(3),
-    proposal_status VARCHAR(8) DEFAULT '0',
+    staffApproved_status VARCHAR(8) DEFAULT '0',
+    teacherApproved_status VARCHAR(8) DEFAULT '0',
     datetimeProposal TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    datetimeApproved DATETIME NULL,
+    teacherApproved_datetime DATETIME NULL,
+    staffApproved_datetime DATETIME NULL,
     staffApproved VARCHAR(8) NULL,
+    TeacherApproved VARCHAR(8) NULL,
+    FOREIGN KEY (classcourse_code) REFERENCES ClassCourse (classcourse_code),
+    FOREIGN KEY (student_code) REFERENCES Students (student_code),
     FOREIGN KEY (teacher_code) REFERENCES Teachers (teacher_code),
+    FOREIGN KEY (TeacherApproved) REFERENCES Teachers (teacher_code),
     FOREIGN KEY (staffApproved) REFERENCES Staffs (staff_code),
     FOREIGN KEY (course_code) REFERENCES Courses (course_code),
     FOREIGN KEY (semester_code) REFERENCES Semesters (semester_code)
@@ -212,8 +225,11 @@ CREATE TABLE ErollClassCourse (
 ) ENGINE=InnoDB;
 
 INSERT INTO Semesters (semester_code, nameSemester, yearSemester) VALUES 
+    ('222', 'Học kỳ 2', '2022-2023'),
     ('231', 'Học kỳ 1', '2023-2024'),
-    ('232', 'Học kỳ 2', '2023-2024');
+    ('232', 'Học kỳ 2', '2023-2024'),
+    ('233', 'Học kỳ phụ', '2023-2024'),
+    ('234', 'Học kỳ hè', '2023-2024');
 
 INSERT INTO Industries (industry_code, industry_name_VNI) VALUES 
     ('CTT', 'Công nghệ thông tin'), -- Infomation Technology
@@ -274,13 +290,13 @@ INSERT INTO Courses (course_code, course_name, course_name_ENG, NumberLecture, N
         ('TH1391', 'Nguyên lý máy học', 'Machine Learning', 2, 2),
         ('TH1382', 'Học sâu', 'Deep Learning', 2, 2);
 
-INSERT INTO ClassCourse (classcourse_code, dateStart, dateEnd, course_id, teacher_id)
+INSERT INTO ClassCourse (classcourse_code, dateStart, dateEnd, course_code, semester_code, teacher_id)
     VALUES
-        ('232_1TH1510_KS3A_01_ngoaigio', '2024-03-11', '2024-06-30',1, 1),
-        ('233_1SP1418_KS1A_tructiep', '2023-03-11', '2023-06-30', 2, 5),
-        ('231_1TH1507_KS3A_04_ngoaigio', '2023-03-11', '2023-06-30', 3, 7),
-        ('222_1TH1391_KS2A_tructiep', '2023-03-11', '2023-06-30', 4, 6),
-        ('232_1TH1382_KS2A_tructiep', '2024-03-11', '2024-06-30', 6, 6);
+        ('232_1TH1510_KS3A_01_ngoaigio', '2024-03-11', '2024-06-30', 'TH1510', '232', 1),
+        ('233_1SP1418_KS1A_tructiep', '2023-03-11', '2023-06-30', 'SP1418', '233', 5),
+        ('231_1TH1507_KS3A_04_ngoaigio', '2023-03-11', '2023-06-30', 'TH1507', '231', 7),
+        ('222_1TH1391_KS2A_tructiep', '2023-03-11', '2023-06-30', 'TH1391', '222', 6),
+        ('232_1TH1382_KS2A_tructiep', '2024-03-11', '2024-06-30', 'TH1382', '232', 6);
 
 INSERT INTO Projects (nameProject, description, teacher_code, classcourse_id, student_code, typeProject)
     VALUES
