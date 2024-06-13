@@ -237,4 +237,7 @@ def project_proposals(projectproposals_id):
         except Exception as e:
                 print('An error occurred: ' + str(e), 'error')  # 'error' is a category
                 return str(e), 500
+        finally:
+            if mycursor is not None:
+                mycursor.close()
         return redirect(url_for('appTeacher.ProjectProposals'))

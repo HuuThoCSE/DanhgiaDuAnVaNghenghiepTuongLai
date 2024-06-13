@@ -221,6 +221,9 @@ def CreateProjectProposals(classcourse_id):
         except Exception as e:
             flash('An error occurred: ' + str(e), 'error')
             return str(e), 500
+        finally:
+            if mycursor is not None:
+                mycursor.close()
     else:
         mycursor = mydb.cursor()
         query = """

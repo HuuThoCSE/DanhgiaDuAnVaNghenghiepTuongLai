@@ -1,4 +1,5 @@
 from flask import Blueprint, request, render_template, session, url_for, redirect, flash
+import requests
 import mysql.connector
 
 # Tạo Blueprint cho module
@@ -105,7 +106,8 @@ def ProjectProposalStaff():
                 CONCAT(lastnameTeacher, ' ', firstnameTeacher) AS teacher_fullname,
                 DATE_FORMAT(a.datetimeProposal, '%H:%i:%s %d-%m-%Y') AS datetimeProposal,
                 DATE_FORMAT(a.teacherApproved_datetime, '%H:%i:%s %d-%m-%Y') AS teacherApproved_datetime,
-                DATE_FORMAT(a.staffApproved_datetime, '%H:%i:%s %d-%m-%Y') AS staffApproved_datetime
+                DATE_FORMAT(a.staffApproved_datetime, '%H:%i:%s %d-%m-%Y') AS staffApproved_datetime,
+                a.category
             FROM ProjectProposal a
             LEFT JOIN Students s ON a.student_code = s.student_code
             LEFT JOIN Teachers b ON a.teacher_code = b.teacher_code
@@ -123,20 +125,36 @@ def ProjectProposalStaff():
             mycursor.close()
     return render_template('staff/project-proposals.html', title="Đề xuất đồ án", response=data, idPerm=session.get('idPerm'))
 
-
 @appStaff.route('/project-proposals/approve/<int:projectproposals_id>', methods=['POST'])
 def project_proposals(projectproposals_id):
     if request.method == 'POST':
         mycursor = None
         try:
             mycursor = mydb.cursor()
-            query = ("UPDATE projectproposal SET staffApproved_status = 1, staffApproved_datetime = NOW(), staffApproved=%s where proposal_id=%s")
-            values = (session.get('staff_code'), projectproposals_id, )
+
+            # Lấy tên dự án từ cơ sở dữ liệu
+            query = "SELECT proposal_title FROM projectproposal WHERE proposal_id = %s"
+            values = (projectproposals_id,)
             mycursor.execute(query, values)
+            project_name = mycursor.fetchone()[0]
+
+            # Gọi API /predict để dự đoán
+            response = requests.post('http://localhost:5000/predict', json={'project_name': project_name})
+            response_data = response.json()  # Lấy dữ liệu JSON từ phản hồi
+
+            # Lưu kết quả dự đoán vào cơ sở dữ liệu (nếu cần)
+            predicted_categories = response_data['categories']
+            update_query = "UPDATE projectproposal SET category = %s, staffApproved_datetime = NOW(), staffApproved_status = 1, staffApproved = %s WHERE proposal_id = %s"
+            update_values = (predicted_categories, "ST"+str(session.get('idStaff')), projectproposals_id)
+            mycursor.execute(update_query, update_values)
             mydb.commit()
-            mycursor.close()
         except Exception as e:
-                print('An error occurred: ' + str(e), 'error')  # 'error' is a category
-                return str(e), 500
+            print(f'An error occurred: {e}', 'error')  # 'error' is a category
+            if mycursor:
+                mycursor.close()
+            return str(e), 500
+        finally:
+            if mycursor:
+                mycursor.close()
         return redirect(url_for('appStaff.ProjectProposalStaff'))
 
