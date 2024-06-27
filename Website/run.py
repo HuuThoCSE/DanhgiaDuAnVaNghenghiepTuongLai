@@ -84,6 +84,8 @@ def index():
                      " FROM Classcourse a"
                      " LEFT JOIN Courses b ON a.idCourse = b.idCourse")
     data = mycursor.fetchall()
+
+    mycursor.close()
     return render_template("classcourse.html", response=data)
 
 @app.route('/logout')

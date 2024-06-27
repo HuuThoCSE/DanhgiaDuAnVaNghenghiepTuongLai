@@ -293,7 +293,7 @@
                         </div>
                         <div class="card-body">
                             <div class="row">
-                                {% if idPerm == 3 %}
+                                {% if idPerm == 3 or idPerm == 2 %}
                                 <a href="/course/{{ response.0 }}/project" class="btn btn-primary">DANH SÁCH ĐỒ ÁN</a>
                                 {% elif idPerm == 4 %}
                                     <a href="/course/{{ response.0 }}/project-proposals" class="btn btn-primary">ĐỀ TÀI ĐỀ XUẤT</a>

@@ -9,7 +9,9 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>SB Admin 2 - Dashboard</title>
+    {% if title %}
+        <title>{{title}}</title>
+    {% endif %}
 
     <!-- Custom fonts for this template-->
     <link href="/statics/style2/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -61,13 +63,13 @@
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
                     aria-expanded="true" aria-controls="collapseTwo">
                     <i class="fas fa-fw fa-cog"></i>
-                    <span>Lớp học</span>
+                    <span>Lớp học phần</span>
                 </a>
 
                 <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Lớp học:</h6>
-                        <a class="collapse-item" href="/student/class">Danh sách lớp học</a>
+                        <h6 class="collapse-header">Lớp học phần:</h6>
+                        <a class="collapse-item" href="/student/class">Danh sách lớp học phần</a>
                     </div>
                 </div>
             </li>
@@ -244,7 +246,47 @@
 
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+                        <h1 class="h3 mb-0 text-gray-800">TRANG CHỦ</h1>
+                    </div>
+
+                    <div class="row">
+                        <!-- Content Column -->
+                        <div class="col-lg-6 mb-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h3><b>Các khóa học được truy cập gần đây</b></h3>
+                                        </div>
+                                        <div class="card-body">
+                                        {% for item in hist_course %}
+                                            <div class="card mt-2">
+                                                <a class="mt-1 ml-1" href="/course/{{item.0}}">{{item.1}}</a>
+                                            </div>
+                                        {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Content Column -->
+                        <div class="col-lg-6 mb-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="card-header">
+                                        <h3><b>Các dự án được truy cập gần đây</b></h3>
+                                    </div>
+                                    <div class="card-body">
+                                    {% for item in response %}
+                                        <div class="card mt-2">
+                                            <a class="mt-1 ml-1" href="/project/{{item.0}}">{{item.1}}</a>
+                                        </div>
+                                    {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Content Row -->

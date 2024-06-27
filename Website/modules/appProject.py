@@ -23,18 +23,24 @@ def infoProject(project_id):
         student_code = session.get('student_code')
         milestone_name = request.form.get('milestone_name')
         milestone_description = request.form.get('milestone_description')
-
         mycursor = mydb.cursor()
         query = """
                 INSERT INTO ProjectProgress (project_id, student_code, milestone_name, milestone_description)
                 VALUES (%s, %s, %s, %s)
                 """
         values = (project_id, student_code, milestone_name, milestone_description)
-
         mycursor.execute(query, values)
         mydb.commit()
+        return redirect(url_for('appProject.infoProject', project_id = project_id))
 
-        return redirect(url_for('appProject.infoProject', project_id=project_id))
+    mycursor = mydb.cursor()
+    query = """
+            INSERT INTO hist_viewproject (histviewproject_idproject, histviewproject_idAccount) 
+            VALUES (%(histviewproject_idproject)s, %(histviewproject_idAccount)s)
+            """
+    mycursor.execute(query, {'histviewproject_idproject': project_id, 'histviewproject_idAccount': session['idAccount']})
+    mydb.commit()
+    mycursor.close()
 
     mycursor = mydb.cursor()
     query = """

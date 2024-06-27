@@ -20,9 +20,33 @@ def DashboardStaff():
         return redirect(url_for('appAuth.Login'))
     if session.get('idPerm') != 2:
         return "Bạn không có quyền vào trang này. Nếu lỗi liên hệ admin."
-    
-    return render_template('staff/staff_dashboard.html', title='Staff Dashboard', idPerm=session.get('idPerm'))
 
+    mycursor = mydb.cursor()
+    query = """
+                SELECT histviewproject_idproject, CONCAT(student_code, ' - ' ,projects.nameProject)
+                from hist_viewproject
+                INNER Join Projects ON hist_viewproject.histviewproject_idproject = Projects.project_id
+                where hist_viewproject.histviewproject_idAccount = %(idAccount)s
+                ORDER BY hist_viewproject.histviewproject_timestamp DESC
+                LIMIT 8;
+                """
+    mycursor.execute(query, {'idAccount': session['idAccount']})
+    data = mycursor.fetchall()
+
+    query = """
+                    SELECT histviewcourse_idclasscourse, CONCAT(classcourse.classcourse_code, ' - ' ,courses.course_name)
+                    from hist_viewcourse
+                    INNER Join classcourse ON hist_viewcourse.histviewcourse_idclasscourse = classcourse.classcourse_id
+                    INNER Join courses ON classcourse.course_code = courses.course_code
+                    where hist_viewcourse.histviewcourse_idAccount = %(idAccount)s
+                    ORDER BY hist_viewcourse.histviewcourse_timestamp DESC
+                    LIMIT 8;
+                    """
+    mycursor.execute(query, {'idAccount': session['idAccount']})
+    data2 = mycursor.fetchall()
+    mycursor.close()
+    
+    return render_template('staff/staff_dashboard.html', title='TRANG CHỦ', idPerm=session.get('idPerm'), response = data, hist_course = data2)
 @appStaff.route('/teacher')
 def TeacherStaff():
     if 'loggedin' not in session:
@@ -33,13 +57,16 @@ def TeacherStaff():
     mycursor.execute("SELECT teacher_id, CONCAT(lastnameTeacher,' ',firstnameTeacher), sex, birthday "
                     " from Teachers")
     data = mycursor.fetchall()    
-    
+    mycursor.close()
+
     return render_template('staff/staff_teacher.html', response=data)
 
 def loadTeacher():
     mycursor = mydb.cursor()
     mycursor.execute("SELECT teacher_id, CONCAT(lastnameTeacher,' ',firstnameTeacher) from Teachers")
-    data = mycursor.fetchall()  
+    data = mycursor.fetchall()
+    mycursor.close()
+
     return data
 
 @appStaff.route('/teacher/add', methods=['GET', 'POST'])
@@ -60,7 +87,7 @@ def AddTeacherStaff():
             values = (lastnameTeacher, firstnameTeacher, sex, birthday,)
             mycursor.execute(query, values)
             mydb.commit()
-            
+            mycursor.close()
             flash('Thêm giảng viên thành công!', 'success')  # 'success' is a category
             return redirect(url_for('appStaff.AddTeacherStaff'))
         except Exception as e:
@@ -82,8 +109,9 @@ def ListClassStaff():
                      " FROM Classcourse a"
                      " LEFT JOIN Courses b ON a.course_code = b.course_code"
                      " LEFT JOIN Teachers c ON a.teacher_id = c.teacher_id")
-    data = mycursor.fetchall()  
-    
+    data = mycursor.fetchall()
+    mycursor.close()
+
     return render_template('staff/staff_listclass.html', response=data, idPerm=session.get('idPerm'))
 
 
@@ -116,6 +144,7 @@ def ProjectProposalStaff():
         mycursor.execute(query)
         data = mycursor.fetchall()
         print(data)
+        mycursor.close()
     except Exception as e:
             flash('An error occurred: ' + str(e), 'error')  # 'error' is a category
             return str(e), 500

@@ -20,8 +20,33 @@ def DashboardStudent():
         return redirect(url_for('appAuth.Login'))
     if session.get('idPerm') != 4:
         return "Bạn không có quyền vào trang này. Nếu lỗi liên hệ admin."
-    
-    return render_template('student/student_dashboard.html')
+
+    mycursor = mydb.cursor()
+    query = """
+                SELECT histviewproject_idproject, CONCAT(student_code, ' - ' ,projects.nameProject)
+                from hist_viewproject
+                INNER Join Projects ON hist_viewproject.histviewproject_idproject = Projects.project_id
+                where hist_viewproject.histviewproject_idAccount = %(idAccount)s
+                ORDER BY hist_viewproject.histviewproject_timestamp DESC
+                LIMIT 8;
+                """
+    mycursor.execute(query, {'idAccount': session['idAccount']})
+    data = mycursor.fetchall()
+
+    query = """
+                    SELECT histviewcourse_idclasscourse, CONCAT(classcourse.classcourse_code, ' - ' ,courses.course_name)
+                    from hist_viewcourse
+                    INNER Join classcourse ON hist_viewcourse.histviewcourse_idclasscourse = classcourse.classcourse_id
+                    INNER Join courses ON classcourse.course_code = courses.course_code
+                    where hist_viewcourse.histviewcourse_idAccount = %(idAccount)s
+                    ORDER BY hist_viewcourse.histviewcourse_timestamp DESC
+                    LIMIT 8;
+                    """
+    mycursor.execute(query, {'idAccount': session['idAccount']})
+    data2 = mycursor.fetchall()
+
+    mycursor.close()
+    return render_template('student/student_dashboard.html', title='TRANG CHỦ', response = data, hist_course = data2)
 
 @appStudent.route('/project')
 def listClassProject():

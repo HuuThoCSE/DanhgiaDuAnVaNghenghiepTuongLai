@@ -28,7 +28,7 @@ def get_menu(idPerm):
             'title': 'Lớp học',
             'icon': 'fa-cog',
             'submenus': [
-                {'name': 'Danh sách lớp học', 'url': '/staff/ListClass'}
+                {'name': 'Danh sách lớp học phần', 'url': '/staff/ListClass'}
             ]
         })
     if idPerm == 3:  # Chỉ Giáo viên
@@ -42,10 +42,10 @@ def get_menu(idPerm):
         })
     if idPerm == 4:  # Chỉ Sinh viên
         menus.append({
-            'title': 'Các khóa học',
+            'title': 'Lớp học phần',
             'icon': 'fa-graduation-cap',
             'submenus': [
-                {'name': 'Khóa học đang theo học', 'url': '/student/courses'},
+                {'name': 'Danh sách LHP', 'url': '/student/courses'},
                 {'name': 'Đề tài đang thực hiện', 'url': '/student/projects'}
             ]
         })
@@ -89,7 +89,7 @@ def editTeacherClass(idClassCourse):
                 """
         mycursor.execute(query, {'idClassCourse': idClassCourse, 'student_code': session.get('student_code')})
         data = mycursor.fetchone()  # Chỉ lấy một kết quả vì chúng ta mong đợi chỉ có một dự án
-
+        mycursor.close()
         if data:
             project_id = data[0]  # Lấy giá trị project_id từ tuple
             return redirect(url_for('appProject.infoProject', project_id=project_id))
@@ -101,6 +101,16 @@ def editTeacherClass(idClassCourse):
         return redirect(url_for('appAuth.Login'))
     if 'idPerm' not in session:
         return "Bạn không có quyền vào trang này. Nếu lỗi liên hệ admin."
+
+    mycursor = mydb.cursor()
+    query = """
+                INSERT INTO hist_viewcourse (histviewcourse_idclasscourse, histviewcourse_idAccount) 
+                VALUES (%(histviewcourse_idclasscourse)s, %(histviewcourse_idAccount)s)
+                """
+    mycursor.execute(query,
+                     {'histviewcourse_idclasscourse': idClassCourse, 'histviewcourse_idAccount': session['idAccount']})
+    mydb.commit()
+    mycursor.close()
 
     mycursor = mydb.cursor()
     query = """
@@ -141,10 +151,13 @@ def ProjectClassCourse(idClassCourse):
             return "Không tìm thấy dự án cho khóa học này."
 
     mycursor = mydb.cursor()
-    mycursor.execute("SELECT a.project_id, a.nameProject, CONCAT(b.student_code, ' - ', b.student_lastname, ' ', b.student_firstname) as infoStudent, a.project_status"
-                     " FROM Projects a"
-                     " LEFT JOIN Students b ON a.student_code = b.student_code"
-                     " WHERE classcourse_code = (select classcourse_code from ClassCourse where classcourse_id = %s)", (idClassCourse, ))
+    query = """
+            SELECT a.project_id, a.nameProject, CONCAT(b.student_code, ' - ', b.student_lastname, ' ', b.student_firstname) as infoStudent, a.project_status
+            FROM Projects a
+            LEFT JOIN Students b ON a.student_code = b.student_code
+            WHERE classcourse_code = (select classcourse_code from ClassCourse where classcourse_id = %s)
+            """
+    mycursor.execute(query, (idClassCourse, ))
     data = mycursor.fetchall()
     print(data)
 
@@ -176,6 +189,7 @@ def ProjectProposals(classcourse_id):
     mycursor.execute(query, {'classcourse_id': classcourse_id})
     data = mycursor.fetchall()
 
+    mycursor.close()
     return render_template('ClassCourse/project_proposals.html', title="Đề xuất Đề tài", response=data, idPerm=session.get('idPerm'))
 
 @appClassCourse.route('/<int:classcourse_id>/project-proposals/create', methods=['GET', 'POST'])
@@ -235,7 +249,7 @@ def CreateProjectProposals(classcourse_id):
 
         mycursor.execute(query, {'classcourse_id': classcourse_id})
         courses = mycursor.fetchone()
-
         print(courses)
 
+        mycursor.close()
         return render_template('ClassCourse/project_proposal_create.html', courses=courses, idPerm=session.get('idPerm'))
