@@ -4,10 +4,6 @@ import mysql.connector
 # Tạo Blueprint cho module
 appAuth = Blueprint('appAuth', __name__, static_folder='../statics')
 
-# Kết nối database
-# connection = connect(config.DATABASE['host'])
-# mycursor = connection.cursor()
-
 mydb = mysql.connector.connect(
     host="localhost",
     user="root",

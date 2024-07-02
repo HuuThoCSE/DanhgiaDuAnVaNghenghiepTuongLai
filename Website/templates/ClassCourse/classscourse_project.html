@@ -62,35 +62,23 @@
             </div>
 
             <!-- Nav Item - Pages Collapse Menu -->
+            {% for menu in menus %}
             <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseGiangvien"
-                    aria-expanded="true" aria-controls="collapseGiangvien">
-                    <i class="fas fa-fw fa-cog"></i>
-                    <span>Giảng viên</span>
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse{{ loop.index }}"
+                    aria-expanded="true" aria-controls="collapse{{ loop.index }}">
+                    <i class="fas fa-fw {{ menu.icon }}"></i>
+                    <span>{{ menu.title }}</span>
                 </a>
-                <div id="collapseGiangvien" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                <div id="collapse{{ loop.index }}" class="collapse" aria-labelledby="heading{{ loop.index }}" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Quản lý giảng viên</h6>
-                        <a class="collapse-item" href="/staff/teacher">Danh sách giảng viên</a>
-                        <a class="collapse-item" href="/staff/teacher/add">Thêm giáo viên</a>
+                        <h6 class="collapse-header">Quản lý {{ menu.title.lower() }}:</h6>
+                        {% for submenu in menu.submenus %}
+                            <a class="collapse-item" href="{{ submenu.url }}">{{ submenu.name }}</a>
+                        {% endfor %}
                     </div>
                 </div>
             </li>
-
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseLophoc"
-                    aria-expanded="true" aria-controls="collapseLophoc">
-                    <i class="fas fa-fw fa-cog"></i>
-                    <span>Lớp học phần</span>
-                </a>
-                <div id="collapseLophoc" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Quản lý lớp học</h6>
-                        <a class="collapse-item" href="/staff/ListClass">Danh sách lớp học phần</a>
-                        <!-- <a class="collapse-item" href="/staff/teacher/add">Thêm lớp học</a> -->
-                    </div>
-                </div>
-            </li>
+            {% endfor %}
 
             <!-- Nav Item - Utilities Collapse Menu -->
             <!-- <li class="nav-item">
@@ -496,7 +484,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Bạn có muốn thoát?</h5>
                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">×</span>
                     </button>

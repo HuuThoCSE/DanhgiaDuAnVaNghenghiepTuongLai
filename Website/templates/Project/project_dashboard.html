@@ -21,6 +21,12 @@
 
     <!-- Custom styles for this template-->
     <link href="/statics/style2/css/sb-admin-2.min.css" rel="stylesheet">
+    <script type="text/javascript" src="/bower_components/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="/bower_components/moment/min/moment.min.js"></script>
+    <script type="text/javascript" src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/bower_components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
+    <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css" />
 
 </head>
 
@@ -258,8 +264,11 @@
                     
 
                     <div class="card">
-                        <div class="card-header">
+                        <div class="card-header d-flex justify-content-between align-items-center">
                             <h1>Tên đề tài: <b>{{ response.1 }}</b></h1>
+                            {% if idPerm == 3 and response.6 == 0 %}
+                                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#mdKetthuc">Kết thúc</button>
+                            {% endif %}
                         </div>
                         <div class="card-body">
                             <div class="row">
@@ -267,13 +276,11 @@
                                     <p><b>Mã lớp học phần:</b> {{ response[2] }}</p>
                                     <p><b>Tên lớp học phần:</b> {{ response[3] }}</p>
                                     <p><b>Sinh viên thực hiện:</b> {{ response[4] }}</p>
-                                    
+                                    <p><b>Giảng viên:</b> {{ response[5] }}</p>
                                     <!-- <p><b>Số lượng sinh viên:</b></p> -->
                                 </div>
                                 <div class="col-6">
-                                    <p><b>Giảng viên:</b> {{ response[5] }}</p>
-                                    <p><b>Tình trạng:</b> 
-                                        
+                                    <p><b>Tình trạng:</b>
                                     {% if response.6 == 0 %}
                                         <span class="badge badge-primary">Đang thực hiện</span>
                                     {% elif response.6 == 1 %}
@@ -285,31 +292,51 @@
                                     </p>
                                     <!-- <p><b>Phòng học:</b></p> -->
                                     <!-- <p><b>Thời gian học:</b></p> -->
-                                    <!-- <p><b>Ngày bắt đầu:</b> {{ response[5] }}</p> -->
-                                    <!-- <p><b>Ngày kết thúc:</b> {{ response[6] }}</p> -->
-                                    <!-- <p><b>Trạng thái:</b> {{ response[9] }}</p> -->
+                                    <p><b>Ngày bắt đầu:</b> {{ response[7] }}</p>
+                                    <p><b>Ngày kết thúc:</b> {{ response[8] }}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    {% if idPerm == 3 or idPerm == 4 %}
+                    {% if idPerm == 2 or idPerm == 3 or idPerm == 4 or idPerm == 5 %}
                     <div class="card mt-2">
                         <div class="card-header">
                             <h1><b>BÁO CÁO TIẾN ĐỘ</b>
-                            {% if idPerm == 4 %}
-                                <button class="btn btn-primary btn-xs ml-2" data-toggle="modal" data-target="#exampleModalCenter">Thêm báo cáo tiến độ</button></h1>
+                            {% if idPerm == 3 and response.6 == 0 %}
+                                <button class="btn btn-primary btn-xs ml-2" data-toggle="modal" data-target="#mdThemBaoCao">Thêm báo cáo tiến độ</button></h1>
                             {% endif %}
                         </div>
                         <div class="card-body">
                                 {% for item in project_list %}
-
                                 <div class="card mt-2">
                                     <div class="card-header">
-                                        <h3><b>{{item.5}} | {{item.3}}</b></h3>
+                                        <h3><b>{{item[3]}}</b>
+                                        {% if idPerm == 3 and response.6 == 0 %}
+                                            <button class="btn btn-success btn-xs ml-2" data-toggle="modal" data-target="#modelNhanxet{{item.0}}">Nhận xét</button></h1>
+                                        {% endif %}
+
+                                        {% if idPerm == 4 and item[8] %}
+
+                                            <button class="btn btn-success btn-xs ml-2" data-toggle="modal" data-target="#modelBaocao{{item.0}}">Báo cáo</button></h1>
+                                        {% endif %}
+                                        </h3>
                                     </div>
                                     <div class="card-body">
-                                        {{item.4}}
+                                        <b>Sinh viên:</b> {{'' if item.4 is none else item.4}} <br>
+                                        <label for="current_attachments"><b>Các file đã đính kèm:</b></label>
+                                        <ul id="current_attachments">
+                                            {% for file in file_list %}
+                                                {% if file[1] == item[0] %}
+                                                    <li>
+                                                        <a href="{{ url_for('appProject.download_file', filename=file[3]) }}" target="_blank">{{ file[2] }}</a>
+                                                    </li>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                    <div class="card-footer">
+                                        <b>Giảng viên:</b> {{'' if item.5 is none else item.5}}
                                     </div>
                                 </div>
                                 {% endfor %}
@@ -366,45 +393,130 @@
     </div>
 
     <!-- Modal -->
-    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    {% if idPerm == 3 %}
+    <div class="modal fade" id="mdThemBaoCao" tabindex="-1" role="dialog" aria-labelledby="mdThemBaoCao" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-            <h2 class="modal-title" id="exampleModalLongTitle">THÊM BÁO CÁO TIẾN ĐỘ</h2>
+            <h2 class="modal-title" id="exampleModalLongTitle">Nhận xét</h2>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
             </div>
             <div class="modal-body">
                 <form method="POST">
-                    <label for="project_id">Project ID:</label>
-                    <input type="text" id="project_id" name="project_id" class="form-control" value="{{response.0}}" disabled><br>
+                    <label for="ppr_comment">Tiêu đề:</label>
+                    <input type="text" id="ppr_title" name="ppr_title" class="form-control" required>
+
+                    <label for="start_time">Bắt đầu:</label>
+                    <input type="datetime-local" id="start_datetime" name="start_datetime" class="form-control" required><br>
+
+                    <label for="start_time">Kết thúc:</label>
+                    <input type="datetime-local" id="end_datetime" name="end_datetime" class="form-control" required><br>
             
-                    <label for="milestone_name">Tên tiến độ:</label>
-                    <input type="text" id="milestone_name" name="milestone_name" class="form-control" required><br>
-            
-                    <label for="milestone_description">Nội dung tiến độ:</label>
-                    <textarea id="milestone_description" name="milestone_description" class="form-control" required></textarea><br>
-            
-                    <!-- <label for="status">Tình trạng:</label>
-                    <input type="text" id="status" name="status" class="form-control" required><br> -->
-            
-                    <!-- <label for="start_date">Start Date:</label>
-                    <input type="date" id="start_date" name="start_date" class="form-control" required><br>
-            
-                    <label for="end_date">End Date:</label>
-                    <input type="date" id="end_date" name="end_date" class="form-control" required><br> -->
-            
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="submit" id="Ins_Report" name="Ins_Report" class="btn btn-success">Thêm</button>
                 </form>
             </div>
-            <!-- <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary">Save changes</button>
-            </div> -->
         </div>
         </div>
     </div>
+    <div class="modal fade" id="mdKetthuc" tabindex="-1" role="dialog" aria-labelledby="mdKetthuc" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h2 class="modal-title" id="exampleModalLongTitle">Đánh giá kết thúc</h2>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            </div>
+            <div class="modal-body">
+                <form method="POST">
+                    <input type="text" id="project_id" name="project_id" class="form-control" value="{{ response.0 }}" hidden>
+                    <label for="milestone_name">Nhận xét:</label>
+                    <textarea id="project_comment_end" name="project_comment_end" class="form-control" rows="4" cols="50" required></textarea><br>
+
+                    <label for="project_point">Điểm:</label>
+                    <input type="text" id="project_point" name="project_point" class="form-control" required> <br>
+
+                    <button type="submit" id="Upd_Ketthuc" name="Upd_Ketthuc" class="btn btn-primary">XÁC NHẬN</button>
+                </form>
+            </div>
+        </div>
+        </div>
+    </div>
+    {%  endif %}
+
+    <!-- Modal -->
+    {% if idPerm == 3 %}
+        {% for item in project_list %}
+        <div class="modal fade" id="modelNhanxet{{ item.0 }}" tabindex="-1" role="dialog" aria-labelledby="modelNhanxet{{ item.0 }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h2 class="modal-title" id="exampleModalLongTitle">{{ item.3 }}</h2>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST">
+                        <label for="project_id" hidden="">Project ID:</label>
+                        <input type="text" id="ppr_id" name="ppr_id" class="form-control" value="{{item.0}}" hidden>
+
+                        <label for="milestone_name">Nhận xét:</label>
+                        <textarea id="ppr_comment" name="ppr_comment" class="form-control" rows="4" cols="50">{{ '' if item.5 is none else item.5 }}</textarea><br>
+
+                        <button type="submit" id="Ins_Comment" name="Ins_Comment" class="btn btn-primary">NHẬN XÉT</button>
+                    </form>
+                </div>
+            </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if idPerm == 4 %}
+        {% for item in project_list %}
+        <div class="modal fade" id="modelBaocao{{ item.0 }}" tabindex="-1" role="dialog" aria-labelledby="modelBaocao{{ item.0 }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 class="modal-title" id="exampleModalLongTitle">{{ item.3 }}</h2>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="POST" enctype="multipart/form-data">
+                            <label for="project_id" hidden="">Project ID:</label>
+                            <input type="text" id="ppr_id" name="ppr_id" class="form-control" value="{{item.0}}" hidden>
+
+                            <label for="milestone_name">Báo cáo:</label>
+                            <textarea id="ppr_content" name="ppr_content" class="form-control" rows="4" cols="50">{{ '' if item.4 is none else item.4 }}</textarea><br>
+
+                            <label for="current_attachments">Các file đã đính kèm:</label>
+                            <ul id="current_attachments">
+                                {% for file in file_list %}
+                                    {% if file[1] == item[0] %}
+                                        <li>
+                                            <a href="{{ url_for('appProject.download_file', filename=file[3]) }}" target="_blank">{{ file[2] }}</a>
+                                            <button type="submit" name="delete_file" value="{{ file[0] }}" class="btn btn-danger btn-sm">Xóa</button>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+
+                            <label for="attachments">Đính kèm file mới:</label>
+                            <input type="file" id="attachments" name="attachments" class="form-control" multiple><br>
+
+                            <button type="submit" id="Ins_Content" name="Ins_Content" class="btn btn-primary">NHẬN XÉT</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% endif %}
 
     <!-- Bootstrap core JavaScript-->
     <script src="/statics/style2/vendor/jquery/jquery.min.js"></script>
@@ -424,5 +536,4 @@
     <script src="/statics/style2/js/demo/chart-pie-demo.js"></script>
 
 </body>
-
 </html>

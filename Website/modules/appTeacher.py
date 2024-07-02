@@ -45,8 +45,6 @@ def DashboardTeacher():
     mycursor.execute(query, {'idAccount': session['idAccount']})
     data2 = mycursor.fetchall()
     mycursor.close()
-
-
     return render_template('teacher/teacher_dashboard.html', title='TRANG CHỦ', response = data, hist_course = data2)
 
 @appTeacher.route('/profile')
@@ -61,17 +59,10 @@ def profileTeacher():
                       " INNER Join Accounts ON Teachers.account_id = Accounts.account_id"
                       " where teacher_id=%s", (session.get('idTeacher'), ))
     data = mycursor.fetchall()
-    
+    mycursor.close()
     print(data)
 
     return render_template('teacher/teacher_profile.html', response=data)
-
-
-# @appTeacher.route('/project/panel')
-# def PanelProjectTeacher():
-#     if 'loggedin' not in session:
-#         return redirect(url_for('appAuth.Login'))
-#     return render_template('teacher/project_dashboard.html')
 
 @appTeacher.route('/class')
 def ListClassTeacher():
@@ -86,6 +77,7 @@ def ListClassTeacher():
                      " WHERE c.teacher_id=%s", (session.get('idTeacher'), ))
     data = mycursor.fetchall()
     mycursor.close()
+
     return render_template('teacher/project_listclass.html', response=data)
 
 @appTeacher.route('class/<nbr>/ListProject')
@@ -97,7 +89,9 @@ def ListProjectTeacher(nbr):
                      " LEFT JOIN Students b ON a.IdLeader = b.IdStudent"
                      " WHERE idClassCourse=%s", (idClassCourse, ))
     data = mycursor.fetchall()
+    mycursor.close()
     print(data)
+
     return render_template('teacher/project_ListProject.html', response=data)
 
 @appTeacher.route('/class/<nbr>')
@@ -115,17 +109,6 @@ def ClassProjectTeacher(nbr):
     data = mycursor.fetchone()    
     print(data)
     return render_template('teacher/project_class.html', title = data[1], response=data, dataclass=idClassCourse, idPerm=session.get('idPerm'))
-
-# @appTeacher.route('class/<nbr>/Project')
-# def ProjectTeacher(nbr):
-#     idProject = nbr
-#     mycursor = mydb.cursor()
-#     mycursor.execute("SELECT a.idProject, a.nameProject, CONCAT(b.codeStudent, ' - ', b.student_lastname, ' ', b.student_firstname) as infoStudent"
-#                      " FROM Projects a"
-#                      " LEFT JOIN Students b ON a.IdLeader = b.IdStudent"
-#                      " WHERE idProject=%s", (idProject, ))
-#     data = mycursor.fetchall()
-#     return render_template('teacher/project_class.html')
 
 @appTeacher.route('class/<idclass>/Project/<idproject>')
 def PanelProjectTeacher(idclass, idproject):
@@ -162,6 +145,7 @@ def ProjectProposals():
         """
     mycursor.execute(query, {'teacher_id': teacher_id})
     data = mycursor.fetchall()
+    mycursor.close()
 
     print(data)
 
@@ -199,6 +183,7 @@ def CreateProjectProposals():
 
     mycursor.execute("SELECT semester_code, CONCAT(semester_code, ' - Học kỳ ', nameSemester, ', ', yearSemester) from Semesters")
     semesters = mycursor.fetchall()
+    mycursor.close()
 
     return render_template('teacher/project_proposal_create.html', courses=courses, semesters=semesters, idPerm=session.get('idPerm'))
 
@@ -248,7 +233,8 @@ def ModifyProposalTeacher(proposal_id):
     
     mycursor.execute("SELECT semester_code, CONCAT(semester_code, ' - Học kỳ ', nameSemester, ', ', yearSemester) from Semesters")
     semesters = mycursor.fetchall()
-    
+    mycursor.close()
+
     return render_template('teacher/project_proposal_modify.html', data=data, courses=courses, semesters=semesters, idPerm=session.get('idPerm'))
 
 @appTeacher.route('/project-proposals/approve/<int:projectproposals_id>', methods=['POST'])

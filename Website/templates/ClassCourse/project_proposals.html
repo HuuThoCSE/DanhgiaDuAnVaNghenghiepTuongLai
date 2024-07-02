@@ -62,34 +62,23 @@
             </div>
 
             <!-- Nav Item - Pages Collapse Menu -->
+            {% for menu in menus %}
             <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
-                    aria-expanded="true" aria-controls="collapseTwo">
-                    <i class="fas fa-fw fa-cog"></i>
-                    <span>Lớp học phần</span>
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse{{ loop.index }}"
+                    aria-expanded="true" aria-controls="collapse{{ loop.index }}">
+                    <i class="fas fa-fw {{ menu.icon }}"></i>
+                    <span>{{ menu.title }}</span>
                 </a>
-                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                <div id="collapse{{ loop.index }}" class="collapse" aria-labelledby="heading{{ loop.index }}" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Quản lý lớp học phần:</h6>
-                        <a class="collapse-item" href="/teacher/class">Danh sách lớp học phần</a>
+                        <h6 class="collapse-header">Quản lý {{ menu.title.lower() }}:</h6>
+                        {% for submenu in menu.submenus %}
+                            <a class="collapse-item" href="{{ submenu.url }}">{{ submenu.name }}</a>
+                        {% endfor %}
                     </div>
                 </div>
             </li>
-
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseDoAn"
-                    aria-expanded="true" aria-controls="collapseDoAn">
-                    <i class="fas fa-fw fa-cog"></i>
-                    <span>Đề tài Đồ án</span>
-                </a>
-                <div id="collapseDoAn" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Quản lý Đề tài đồ án</h6>
-                        <a class="collapse-item" href="/project-proposals">Danh sách Đề xuất Đề tài</a>
-                        <a class="collapse-item" href="/project-proposals/create">Thêm Đề xuất đề tài</a>
-                    </div>
-                </div>
-            </li>
+            {% endfor %}
 
             <!-- Nav Item - Utilities Collapse Menu -->
             <!-- <li class="nav-item">
